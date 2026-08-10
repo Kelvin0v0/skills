@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interruption Queue"
+  short_description: "Queue side requests without requirement drift"
+  default_prompt: "Use $interruption-queue to classify and record this side request safely."

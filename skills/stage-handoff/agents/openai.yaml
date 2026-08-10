@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stage Handoff"
+  short_description: "Create concise, traceable context handoffs"
+  default_prompt: "Use $stage-handoff to create a durable handoff for the next workflow stage."

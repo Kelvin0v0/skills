@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workflow Orchestrator"
+  short_description: "Coordinate staged work with explicit gates"
+  default_prompt: "Use $workflow-orchestrator to coordinate this task through staged gates and durable handoffs."
