@@ -2,6 +2,7 @@
   "schema_version": "1.0",
   "id": "IMP-###",
   "requirement_id": "REQ-###",
+  "ticket_id": "TICKET-###",
   "plan_id": "PLAN-###",
   "task": "",
   "status": "pending",

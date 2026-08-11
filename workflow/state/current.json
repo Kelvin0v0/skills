@@ -1,12 +1,16 @@
 {
   "schema_version": "1.0",
   "active_requirement_id": null,
+  "active_spec_path": null,
+  "active_ticket_id": null,
   "active_plan_id": null,
   "phase": "idle",
   "requirement_approved": false,
   "plan_approved": false,
   "implementation_complete": false,
   "verification_status": "not_started",
+  "suspended_by": null,
+  "resume_after": null,
   "next_action": null,
   "updated_at": null
 }

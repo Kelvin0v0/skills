@@ -2,6 +2,7 @@
   "schema_version": "1.0",
   "id": "PLAN-###",
   "requirement_id": "REQ-###",
+  "ticket_id": "TICKET-###",
   "approach": "",
   "affected_components": [],
   "steps": [],

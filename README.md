@@ -8,44 +8,49 @@ It is designed for four practical problems: context overload in the main chat, w
 
 ```mermaid
 flowchart TD
-    U[User idea or request] --> RR[Requirement refiner]
-    RR --> REQ[REQ contract]
-    REQ --> RG{Main gate: requirement approved?}
-    RG -->|Refine| RR
-    RG -->|Approved| P[Implementation planner]
-    P --> PLAN[PLAN contract]
-    PLAN --> PG{Main gate: plan approved?}
-    PG -->|Revise| P
-    PG -->|Approved| W[Bounded worker or workers]
-    W --> IMP[Implementation report]
-    IMP --> V[Independent verifier in fresh context]
-    V --> VR{Verification report}
-    VR -->|Pass| CG{Main review: complete?}
-    CG -->|Yes| C[Completion]
-    CG -->|No| W
-    VR -->|Fail| FI[Failure investigator]
-    FI --> FC{Failure classification}
-    FC -->|Implementation defect| W
-    FC -->|Requirement or scope conflict| RR
-    FC -->|Environment or unknown| B[Blocked: collect evidence]
+    U[User request] --> S1[Step 1: Clarify only unknown intent<br/>Output: clear problem, scope, and constraints]
+    subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
+        S1 --> S2[Step 2: Save the detailed requirement<br/>Output: acceptance criteria and exclusions]
+        S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
+        G1 -->|Needs refinement| S1
+        G1 -->|Approved| S4[Step 4: Create high-level tickets<br/>Output: ordered, dependency-aware subtasks]
+        S4 --> S5[Step 5: Select one ticket<br/>Rule: keep all other work out of active context]
+        S5 --> S6[Step 6: Plan the selected ticket<br/>Output: repository-grounded changes and checks]
+        S6 --> G2{Step 7: User approves the plan?<br/>Decision: build it this way?}
+        G2 -->|Needs revision| S6
+        G2 -->|Approved| S8[Step 8: Implement only the approved ticket<br/>Output: code changes and self-check evidence]
+        S8 --> S9[Step 9: Verify in a fresh context<br/>Output: independent evidence against acceptance criteria]
+        S9 --> G3{Acceptance criteria pass?}
+        G3 -->|Yes| S10[Step 10: Record completion<br/>Output: verified result and next ticket]
+    end
 
-    QI[Question, bug, or idea during any stage] --> Q{Classify interruption}
-    Q -->|Blocker or safety risk| BI[Pause and handle now]
-    BI --> MG[Main state gate: decide recovery]
-    MG -. main agent updates only .-> ST
-    Q -->|Non-blocking| QF[workflow/state/queue.json]
-    QF --> L[Process later]
-    L -->|Changes requirement| RR
-    L -->|Independent follow-up| F[Resolve or dismiss]
+    ST[(current.json: active work and approvals)]
+    G1 -. main agent records decision .-> ST
+    G2 -. main agent records decision .-> ST
+    S10 -. main agent records completion .-> ST
 
-    ST[(workflow/state/current.json)] -. active phase and approvals .-> RG
-    ST -. active phase and approvals .-> PG
-    RG -. main agent updates only .-> ST
-    PG -. main agent updates only .-> ST
-    CG -. main agent updates only .-> ST
+    IN[New user input during any active step] --> C{Classify: does it change active work?}
+    C -->|Clarification only| A[Answer without changing scope] --> R[Resume the same active step]
+    C -->|New requirement or enhancement| Q[Queue it separately<br/>It cannot alter the active ticket]
+    Q --> L[When chosen later: save a new requirement]
+    L --> S2
+    C -->|Unrelated bug| QB[Queue it as separate work]
+    QB --> BT[When chosen later: create its own requirement and ticket]
+    BT --> S2
+    C -->|Bug fails active acceptance criteria| I[Investigate or reproduce<br/>Output: evidence and likely cause]
+    I --> P{Does the approved plan already cover repair?}
+    P -->|Yes| S8
+    P -->|No: scope changed| S2
+    C -->|Safety, data-loss, or production blocker| X[Suspend active work<br/>Handle the urgent risk first]
+    X -. main agent records suspension .-> ST
+    X --> D{Recovery decision}
+    D -->|Resume| R
+    D -->|Scope changed| S2
+
+    S1 -. work in progress .-> IN
 ```
 
-The main agent is a state and decision controller, not a container for every specialist's reasoning. Specialists return compact JSON evidence; only the main agent validates it and advances `current.json`.
+The numbered path is the normal flow. The lower routes show what happens when the user interrupts it: answer a harmless clarification, queue separate work, investigate an active-ticket failure, or suspend work for an urgent blocker. The main agent alone records each state change.
 
 ## Two-dice theory: shrink the possibility space
 

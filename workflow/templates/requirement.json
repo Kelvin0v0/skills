@@ -1,6 +1,7 @@
 {
   "schema_version": "1.0",
   "id": "REQ-###",
+  "spec_path": "",
   "goal": "",
   "must": [],
   "must_not": [],
