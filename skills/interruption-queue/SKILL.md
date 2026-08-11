@@ -14,7 +14,7 @@ Use `workflow/state/queue.json` as the durable buffer for work that should be re
 - **normal** — useful but non-blocking; record it and continue the active stage.
 - **idea** — a future improvement or alternative; record it unless the user explicitly promotes it.
 
-If the item changes acceptance criteria, scope, architecture, or safety assumptions, classify it as `requirement_change`. Keep the active ticket unchanged, then route the item through `to-spec`, user approval, and `to-tickets`.
+If the item changes acceptance criteria, scope, architecture, or safety assumptions, classify it as `requirement_change`. Keep the active ticket unchanged, then route the item through a fresh `requirement-refiner`, user approval, and fresh `story-breakdown`.
 
 ## Queue record
 
@@ -55,8 +55,11 @@ When processing queued work:
 
 1. Select a pending item and set it to `in_progress`.
 2. Re-read the related requirement and verify that the item is still relevant.
-3. If it changes the active requirement, set it to `promoted` and route it through `to-spec`, user approval, and `to-tickets`.
+3. If it changes the active requirement, set it to `promoted` and route it through a fresh `requirement-refiner`, user approval, and fresh `story-breakdown`.
 4. Otherwise resolve or dismiss it with a concise evidence-backed explanation.
 5. Record the resolution and timestamp; retain the item as history.
 
 If a queued bug reveals a current defect, create a focused remediation path and link it to both the queue item and the affected requirement. Do not modify the active plan without recording why.
+
+Return: queue action, one-sentence summary, exact `workflow/state/queue.json`
+path, active-work impact or `none`, and one next action.

@@ -40,6 +40,8 @@ The receiving specialist may consume the handoff, but only the main agent may va
 
 - State facts separately from assumptions.
 - Prefer links to files, diffs, test output, or other evidence over copied logs.
+- Record every artifact with its exact relative path; the coordinator exposes
+  that path as a clickable user-facing link when supported.
 - Keep `next_action` singular and executable.
 - Preserve requirement and artifact IDs across stages.
 - Include only decisions relevant to the receiving stage.

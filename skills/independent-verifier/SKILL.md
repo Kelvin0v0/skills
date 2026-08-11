@@ -17,7 +17,9 @@ Read the approved requirement, approved plan, implementation report, actual diff
 2. Run focused checks and relevant broader checks in proportion to risk.
 3. Inspect the diff for scope expansion, regressions, unverified claims, and whether the plan's reuse decision and implementation contract were followed without unnecessary duplication.
 4. Write `workflow/reports/VER-###.json` from `workflow/templates/verification-report.json`.
-5. Return `pass` or `fail` plus evidence and one recommended next action.
+5. Return: `pass` or `fail`, one-sentence result, exact
+`workflow/reports/VER-###.json` path, blocking failure or `none`, and one
+recommended next action. Keep detailed evidence in the report.
 
 ## Boundaries
 

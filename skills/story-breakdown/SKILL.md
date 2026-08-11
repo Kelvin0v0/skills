@@ -27,3 +27,8 @@ template. Do not read chat history or inspect product source.
 - Do not approve tickets, select the active ticket, update `current.json`, or ask the user questions.
 - Return a scope conflict to the coordinator for requirement refinement.
 - Keep the artifacts concise; do not reproduce the requirement text.
+
+## Handoff
+
+Return: status, one-sentence ticket summary, exact `workflow/tickets/TICKET-###.json`
+paths in suggested order, open blocker or `none`, and one next action.

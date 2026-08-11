@@ -17,7 +17,9 @@ For `needs_investigation`, read the assigned question, evidence levels, allowed 
 2. Classify the cause as one of: `implementation_defect`, `requirement_scope_conflict`, `environment`, or `unknown`.
 3. Identify the root cause, evidence, scope impact, and the narrowest safe recovery path.
 4. Write `workflow/reports/INV-###.json` from `workflow/templates/investigation-report.json`.
-5. Return the report to the coordinator.
+5. Return: status, one-sentence conclusion, exact
+`workflow/reports/INV-###.json` path, unresolved question or `none`, and one
+recommended route.
 
 ## Routing rules
 

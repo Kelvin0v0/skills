@@ -71,6 +71,14 @@ recommended next action. It cannot update state, approvals, scope, or completion
 Keep user decisions, tiny work, routing, and all workflow-state changes with
 the coordinator.
 
+## Worker result and user view
+
+Every worker returns at most five items: status, one-sentence summary, exact
+artifact path, open decision or block, and one next action. The coordinator
+shows the same result to the user in plain language. Include a clickable file
+link when the client supports it and always repeat the exact relative path;
+do not ask the user to interpret raw JSON or search for the file.
+
 ## Context budget
 
 Target the coordinator at under 40% of available context. Treat this as an

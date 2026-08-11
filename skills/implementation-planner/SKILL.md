@@ -39,4 +39,8 @@ history alone.
 
 ## Handoff
 
-Return the plan ID, evidence paths, scope conflicts, risks, and one next action. A plan is ready for approval only when it satisfies the approved requirement and identifies how verification will be performed.
+Return: status, one-sentence plan summary, exact `workflow/plans/PLAN-###.json`
+path, scope conflict or `none`, and one next action. Include evidence paths
+only when they affect the approval decision. A plan is ready for approval only
+when it satisfies the approved requirement and identifies how verification will
+be performed.

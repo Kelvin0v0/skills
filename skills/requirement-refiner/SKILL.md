@@ -31,4 +31,7 @@ should implement it.
 
 ## Handoff
 
-Return the requirement ID, a one-sentence goal, unresolved questions, and the next action. A requirement is ready for approval only when acceptance criteria are testable and no material ambiguity remains.
+Return: status, one-sentence goal, exact `workflow/requirements/REQ-###.json`
+path, unresolved question or `none`, and one next action. A requirement is
+ready for approval only when acceptance criteria are testable and no material
+ambiguity remains.

@@ -17,7 +17,9 @@ Read the approved `REQ-###.json`, approved `PLAN-###.json` including its reuse d
 2. Make the smallest change that satisfies the assigned task.
 3. Run focused checks appropriate to the change.
 4. Write `workflow/reports/IMP-###.json` from `workflow/templates/implementation-report.json`.
-5. Return changed paths, checks run, evidence, blocks, and a next action.
+5. Return: status, one-sentence result, exact `workflow/reports/IMP-###.json`
+path, block or `none`, and one next action. Keep changed paths and checks in
+the report unless they are material to the handoff.
 
 ## Boundaries
 

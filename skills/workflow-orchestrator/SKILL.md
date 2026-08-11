@@ -48,7 +48,12 @@ specialist only:
 - constraints and known risks;
 - the requested output and validation boundary.
 
-Require the specialist to return a concise structured handoff. Store large logs or generated artifacts on disk and return paths plus a distilled conclusion. Do not ask a reviewer to rely on the implementer's unfiltered reasoning.
+Require the specialist to return five items: status, one-sentence summary,
+exact artifact path, open decision or block, and one next action. Store large
+logs or generated artifacts on disk. The coordinator presents that result to
+the user with a clickable artifact link and the exact path, rather than raw
+JSON or a request to search for the file. Do not ask a reviewer to rely on the
+implementer's unfiltered reasoning.
 
 Delegate when a task needs evidence, is independent, bounded, or more cost-effective on a lower-capability worker. Keep only user decisions, routing, and workflow administration with the coordinator.
 

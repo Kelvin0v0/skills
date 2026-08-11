@@ -217,6 +217,23 @@ decisions, and next action in `current.json`. Keep detailed worker output on
 disk. If the coordinator becomes noisy before a checkpoint, finish the worker
 artifact, save the state snapshot, and continue in a fresh coordinator chat.
 
+## Worker results
+
+Every worker returns the same compact result: status, one-sentence summary,
+exact artifact path, open decision or block, and next action. The coordinator
+shows this to the user in plain language and provides both a clickable link and
+the explicit relative path; users should not need to search the repository or
+read raw JSON to know what requires approval.
+
+```text
+Requirement ready
+Summary: Add account lockout after repeated failed sign-ins.
+File: [REQ-001.json](workflow/requirements/REQ-001.json)
+Path: workflow/requirements/REQ-001.json
+Needs you: Approve the requirement.
+Next: Start fresh story breakdown after approval.
+```
+
 ## Evaluate the workflow
 
 Treat this as an engineering hypothesis, not a guaranteed improvement. Compare each delivery profile with a normal workflow across real tasks. Measure requirement changes, rework count, failed verifications, elapsed time, token use, and agent cost. Remove or compress gates that do not improve outcomes enough to justify their overhead.
