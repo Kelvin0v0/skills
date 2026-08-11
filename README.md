@@ -82,6 +82,19 @@ If a downstream agent discovers evidence that creates new ambiguity or expands s
 - Non-blocking questions, bugs, and ideas go to `queue.json`; they cannot silently modify the active requirement.
 - Large reasoning traces remain in artifacts. The main context receives concise conclusions and paths only.
 
+## Delivery profiles
+
+The main agent selects a profile at requirement approval and may revise it only
+at a later gate when scope or risk changes. The profile controls how much
+documentation and delegation is useful; it does not transfer state authority or
+remove the need for appropriate verification.
+
+| Profile | Use it for | Required shape |
+| --- | --- | --- |
+| `light` | Small, low-risk work | One compact ticket and plan; focused verification; subagents only when useful. |
+| `standard` | Normal product or code change | Requirement, tickets, selected-ticket plan, bounded implementation, independent verification. |
+| `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, and extra evidence where needed. |
+
 ## Repository contents
 
 | Path | Purpose |
@@ -113,18 +126,19 @@ This is controlled context rehydration: the main agent knows where information l
 ## Artifact flow
 
 1. Use `workflow/templates/requirement.json` to create `workflow/requirements/REQ-###.json`.
-2. After approval, create `workflow/plans/PLAN-###.json` from the plan template.
-3. Assign a worker a specific task and capture its result as `workflow/reports/IMP-###.json`.
-4. Independently verify it in `workflow/reports/VER-###.json`.
-5. If verification fails, record the classification in `workflow/reports/INV-###.json` before routing the work.
-6. Update `workflow/state/current.json` only after the main agent validates the relevant artifact.
+2. After requirement approval, create dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
+3. Select one ticket and create its `workflow/plans/PLAN-###.json` artifact; obtain plan approval.
+4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
+5. Independently verify it in `workflow/reports/VER-###.json`.
+6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.
+7. Update `workflow/state/current.json` only at a state checkpoint: approval, ticket selection, investigation conclusion, verification, pause/resume, or completion.
 
 ## Delegation policy
 
-Delegate when the work is independent, bounded, likely to fill the main context, or suitable for a lower-cost worker. Keep work with the main agent when it is small, directly tied to a current decision, or needs user approval.
+Delegate only when the work needs independent evidence, is safely independent, or would fill the main context. Keep work with the main agent when it is small, directly tied to a current decision, or needs user approval.
 
 The architecture does not require every role to be a separate agent on every task. The invariant is the contracts and gates, not the number of agents.
 
 ## Evaluate the workflow
 
-Treat this as an engineering hypothesis, not a guaranteed improvement. Compare it with a normal workflow across real tasks and measure requirement failures, rework, token use, cost, latency, and completion time. Keep the structure only where it improves reliability enough to justify its overhead.
+Treat this as an engineering hypothesis, not a guaranteed improvement. Compare each delivery profile with a normal workflow across real tasks. Measure requirement changes, rework count, failed verifications, elapsed time, token use, and agent cost. Remove or compress gates that do not improve outcomes enough to justify their overhead.

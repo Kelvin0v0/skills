@@ -1,5 +1,6 @@
 {
   "schema_version": "1.0",
+  "delivery_profile": null,
   "active_requirement_id": null,
   "active_spec_path": null,
   "active_ticket_id": null,
