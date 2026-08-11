@@ -10,15 +10,18 @@ Convert user intent into a durable requirement contract. Clarify **what** the us
 ## Process
 
 1. Restate the goal in plain language.
-2. Separate mandatory behavior, exclusions, assumptions, and unresolved decisions.
-3. Write observable acceptance criteria.
-4. Create `workflow/requirements/REQ-###.json` from `workflow/templates/requirement.json`.
-5. Return the contract to the main agent for approval.
+2. Run a mandatory uncertainty audit across behavior and acceptance criteria, scope and non-goals, constraints and risks, and relevant integration, data, permission, or migration impact.
+3. Classify each material uncertainty as resolved, an assumption requiring approval, needs user input, or needs investigation.
+4. Separate mandatory behavior, exclusions, assumptions, and unresolved decisions.
+5. Write observable acceptance criteria.
+6. Create `workflow/requirements/REQ-###.json` from `workflow/templates/requirement.json`, including the audit.
+7. Return the contract to the main agent for approval only when no material uncertainty needs user input or investigation.
 
 ## Contract rules
 
 - Keep the contract concise; do not copy conversation history or speculative implementation details.
 - Mark every behavior-changing uncertainty in `unresolved`.
+- Do not treat an unknown as resolved merely because no question was asked.
 - Use `must_not` for explicit scope boundaries.
 - Do not set `approved: true`; only the main agent may record approval after the required user decision.
 - If new evidence changes the contract later, create a revision and return to the main gate.

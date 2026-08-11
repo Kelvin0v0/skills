@@ -17,10 +17,11 @@ Read the approved `REQ-###.json`, relevant repository files, and `workflow/state
 2. Record the plan's reuse decision: existing feature or mechanism, files and symbols checked, `reuse`, `extend`, `replace`, or `create_new`, and the reason.
 3. Record the implementation contract: acceptance-criterion references, design trade-offs, expected files and symbols, boundaries, required checks, and future posture.
 4. Record future posture only for a known variation supported by repository, ticket, or user evidence; otherwise set `no_future_generalisation`.
-5. If repository evidence is insufficient, use a read-only investigation only as needed; record its report ID. Do not invent a candidate or delegate by default.
-6. Create `workflow/plans/PLAN-###.json` from `workflow/templates/plan.json`.
-7. List the approach, affected components, ordered steps, tests, risks, and any scope conflict.
-8. Return the plan to the main agent for approval.
+5. Re-run the uncertainty audit for material behavior, scope, reuse/design, integration, data, permission, migration, risk, or boundary questions exposed by inspection. Route user-intent uncertainty to requirement refinement, ticket-scope uncertainty to ticket decomposition, and technical uncertainty to bounded investigation.
+6. If repository evidence is insufficient, use a read-only investigation only as needed; record its report ID. Do not invent a candidate or delegate by default.
+7. Create `workflow/plans/PLAN-###.json` from `workflow/templates/plan.json`.
+8. List the approach, affected components, ordered steps, tests, risks, and any scope conflict.
+9. Return the plan to the main agent for approval only when no material uncertainty remains.
 
 ## Boundaries
 

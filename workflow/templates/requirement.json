@@ -8,6 +8,11 @@
   "acceptance_criteria": [],
   "assumptions": [],
   "unresolved": [],
+  "clarification_audit": {
+    "status": "pending",
+    "checked_areas": [],
+    "material_uncertainties": []
+  },
   "approved": false,
   "approved_by": null,
   "approved_at": null

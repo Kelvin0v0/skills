@@ -7,12 +7,21 @@ approve a requirement or plan, suspend or resume work, or declare completion.
 
 ## Required flow
 
-`clarify (if needed) -> save requirement -> requirement approval -> create tickets ->
+`mandatory uncertainty audit -> save requirement -> requirement approval -> create tickets ->
 select ticket -> detailed ticket plan -> plan approval -> implement ->
 independent verification -> completion`
 
 Do not implement before the requirement and selected ticket plan are approved.
 Do not treat worker self-checks as final verification.
+
+## Mandatory uncertainty audit
+
+Before saving a requirement, classify each material uncertainty as resolved,
+an assumption requiring approval, needs user input, or needs investigation.
+Check behavior and acceptance criteria, scope and non-goals, constraints and
+risks, and any relevant integration, data, permission, or migration impact.
+Do not advance while a material uncertainty needs user input or investigation;
+an unknown is not resolved merely because no question was asked.
 
 ## Delivery profile
 

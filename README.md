@@ -8,9 +8,12 @@ It is designed for four practical problems: context overload in the main chat, w
 
 ```mermaid
 flowchart TD
-    U[User request] --> S1[Step 1: Clarify only unknown intent<br/>Output: clear problem, scope, and constraints]
+    U[User request] --> S1[Step 1: Mandatory uncertainty audit<br/>Check behavior, scope, constraints, and risks]
     subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
-        S1 --> S2[Step 2: Save the detailed requirement<br/>Output: acceptance criteria and exclusions]
+        S1 --> A1{Every material uncertainty routed?}
+        A1 -->|Needs user input| Q1[Ask a targeted question] --> S1
+        A1 -->|Needs investigation| I1[Run bounded investigation] --> S1
+        A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: acceptance criteria, exclusions, and audit]
         S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
         G1 -->|Needs refinement| S1
         G1 -->|Approved| S4[Step 4: Create high-level tickets<br/>Output: ordered, dependency-aware subtasks]
@@ -32,20 +35,20 @@ flowchart TD
     IN[New user input during any active step] --> C{Classify: does it change active work?}
     C -->|Clarification only| A[Answer without changing scope] --> R[Resume the same active step]
     C -->|New requirement or enhancement| Q[Queue it separately<br/>It cannot alter the active ticket]
-    Q --> L[When chosen later: save a new requirement]
-    L --> S2
+    Q --> L[When chosen later: start Step 1 audit]
+    L --> S1
     C -->|Unrelated bug| QB[Queue it as separate work]
-    QB --> BT[When chosen later: create its own requirement and ticket]
-    BT --> S2
+    QB --> BT[When chosen later: start Step 1 audit for its own work]
+    BT --> S1
     C -->|Bug fails active acceptance criteria| I[Investigate or reproduce<br/>Output: evidence and likely cause]
     I --> P{Does the approved plan already cover repair?}
     P -->|Yes| S8
-    P -->|No: scope changed| S2
+    P -->|No: scope changed| S1
     C -->|Safety, data-loss, or production blocker| X[Suspend active work<br/>Handle the urgent risk first]
     X -. main agent records suspension .-> ST
     X --> D{Recovery decision}
     D -->|Resume| R
-    D -->|Scope changed| S2
+    D -->|Scope changed| S1
 
     S1 -. work in progress .-> IN
 ```
@@ -81,6 +84,18 @@ If a downstream agent discovers evidence that creates new ambiguity or expands s
 - Verification failures are investigated before rework, separating an implementation defect from a requirement or scope conflict.
 - Non-blocking questions, bugs, and ideas go to `queue.json`; they cannot silently modify the active requirement.
 - Large reasoning traces remain in artifacts. The main context receives concise conclusions and paths only.
+
+## Mandatory uncertainty audit
+
+Clarification is mandatory, but asking a question is not automatic. Before a
+requirement can move forward, classify each material uncertainty as resolved,
+an assumption requiring approval, needs user input, or needs investigation. The
+audit covers behavior and acceptance criteria, scope and non-goals, constraints
+and risks, and relevant integration, data, permission, or migration impact.
+
+Do not advance merely because the agent cannot think of another question. A
+material unknown must be resolved, recorded as an approval-needed assumption,
+or routed to targeted user input or bounded investigation.
 
 ## Delivery profiles
 
@@ -142,7 +157,7 @@ This is controlled context rehydration: the main agent knows where information l
 
 1. Use `workflow/templates/requirement.json` to create `workflow/requirements/REQ-###.json`.
 2. After requirement approval, create dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
-3. Select one ticket and create its `workflow/plans/PLAN-###.json` artifact, including its implementation contract; obtain plan approval.
+3. Select one ticket, repeat the uncertainty audit after repository inspection, and create its `workflow/plans/PLAN-###.json` artifact, including its implementation contract; obtain plan approval.
 4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
 5. Independently verify it in `workflow/reports/VER-###.json`.
 6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.
