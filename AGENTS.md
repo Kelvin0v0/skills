@@ -6,39 +6,67 @@ This repository defines a staged, context-aware workflow for turning user intent
 
 - Keep the active requirement stable while work is in progress.
 - Move work through explicit stages instead of letting conversation order determine execution order.
-- Prefer a fresh specialist context for substantial exploration, implementation, verification, or review.
-- Persist important decisions and outputs in files; do not rely on chat history alone.
-- Every stage must produce a concise handoff that lets the next stage continue without reconstructing the whole conversation.
+- Keep the main agent small and decision-focused; isolate substantial reasoning in bounded specialist contexts.
+- Persist compact contracts and evidence in files; do not rely on chat history alone.
+- Every successful boundary must reduce the remaining possibility space. If new evidence creates ambiguity or expands scope, send it upward to the main gate.
 - Questions, bugs, and ideas raised during active work must be classified before they can change the active requirement.
 
-## Default lifecycle
+## Authority model
 
-Use this sequence unless the task is clearly smaller or the user requests a different process:
+The **main agent** is the only authority that may update `workflow/state/current.json`, approve a requirement or plan, advance the workflow phase, or declare completion.
 
-`intake -> discovery -> specification -> planning -> implementation -> verification -> review -> completion`
+Specialists may inspect, implement, test, and write evidence artifacts. Their reports are evidence and recommendations, never authorization. Do not allow agent-to-agent state changes without the main agent validating the report and recording the transition.
 
-Each stage has an entry condition, an output, and an exit gate. Do not silently skip a gate when the skipped decision could change scope, risk, or acceptance criteria.
+Use logical roles, not permanently running agents:
 
-## Durable state
+- **Requirement refiner** clarifies intent and writes the requirement contract.
+- **Implementation planner** inspects the codebase and writes an implementation plan for an approved requirement.
+- **Bounded worker** implements an approved task without redefining scope.
+- **Independent verifier** tests the actual change against the approved requirement and plan in a fresh context.
+- **Failure investigator** classifies a failed verification and recommends the recovery path.
+
+Use a specialist when work is independent, bounded, likely to pollute the main context, or can be performed cost-effectively by a lower-capability model. Keep work with the main agent when it is tiny, depends directly on the current decision, or requires user approval.
+
+## Default lifecycle and gates
+
+`intake -> requirement refinement -> requirement approval -> planning -> plan approval -> implementation -> independent verification -> review -> completion`
+
+Do not implement before both the requirement and plan are approved. Do not complete before independent verification and review provide evidence that the acceptance criteria are satisfied.
+
+| Gate | Required evidence | Main-agent decision |
+| --- | --- | --- |
+| Requirement approval | `REQ-###.json` with clear acceptance criteria and no material unresolved question | approve, refine again, or defer |
+| Plan approval | `PLAN-###.json` grounded in the repository and within requirement scope | approve, revise, or return to refinement |
+| Verification | `VER-###.json` with test and acceptance-criterion results | complete, return defect to worker, or investigate |
+| Completion | verification evidence plus final review | mark complete and report residual risks |
+
+For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Record which gate was compressed and why.
+
+## Durable state and artifacts
 
 Keep durable workflow state below `workflow/`:
 
+- `workflow/state/current.json` is the small authoritative snapshot of the active requirement, phase, approvals, and next action.
 - `workflow/state/queue.json` contains non-blocking interruptions.
-- `workflow/handoffs/` contains stage-to-stage handoff artifacts when a task needs more than one context.
-- Requirement, plan, decision, and verification artifacts should use stable IDs and link back to the active requirement.
+- `workflow/requirements/REQ-###.json` contains approved or pending requirement contracts.
+- `workflow/plans/PLAN-###.json` contains implementation plans linked to a requirement.
+- `workflow/reports/` contains implementation, verification, and investigation reports.
+- `workflow/handoffs/` contains stage-to-stage handoff artifacts when a task crosses contexts.
+- `workflow/templates/` provides the canonical schemas for new artifacts.
 
-The filesystem is the source of truth for durable state. Chat is a transport layer, not the only record.
+The filesystem is the source of truth for durable state. Chat is a transport layer, not the only record. Keep `current.json` small; store detailed reasoning and evidence in linked artifacts rather than a giant memory file.
 
 ## Stage rules
 
 1. Intake: restate the request, identify the desired outcome, and record unknowns.
-2. Discovery: inspect the relevant repository or source material and record evidence, constraints, and risks.
-3. Specification: write testable acceptance criteria. Resolve ambiguity before implementation when it affects behavior.
-4. Planning: choose the smallest sequence of verifiable changes and identify the files or seams involved.
-5. Implementation: make incremental changes and preserve unrelated user work.
-6. Verification: run focused checks after meaningful changes, then the relevant full checks.
-7. Review: compare the result against the specification and repository standards; fix discrepancies before completion.
-8. Completion: report what changed, what was verified, and any remaining risk. Commit only when the user or repository workflow authorizes it.
+2. Requirement refinement: turn the user's intent into a testable `REQ-###.json`; do not design implementation yet.
+3. Requirement approval: the main agent obtains the required user decision and records approval.
+4. Planning: inspect the actual codebase and write a `PLAN-###.json` constrained by the approved requirement.
+5. Plan approval: the main agent obtains approval before implementation.
+6. Implementation: give a bounded worker only the approved requirement, approved plan, and assigned subtask. The worker writes an implementation report.
+7. Independent verification: use a fresh context to test the requirement, plan, and actual diff. The verifier writes a verification report and does not trust worker claims.
+8. Failure investigation: classify a failed verification as an implementation defect, requirement/scope conflict, environment issue, or unknown. Route defects to the worker; route requirement conflicts to the main gate.
+9. Review and completion: review the result against the specification and repository standards. The main agent alone records completion.
 
 ## Interruption policy
 
@@ -47,7 +75,7 @@ When a user asks a side question, reports a bug, or proposes an idea during an a
 - Handle it immediately only if it blocks the active work or creates an immediate safety/data-loss risk.
 - Otherwise record it in `workflow/state/queue.json` using the interruption-queue skill.
 - A queued item must not silently modify the active requirement.
-- If later investigation shows that the item affects the active requirement, return it through intake and specification before changing course.
+- If later investigation shows that the item affects the active requirement, promote it through requirement refinement and the relevant approval gate before changing course.
 
 ## Handoff policy
 

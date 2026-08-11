@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "id": "INV-###",
+  "verification_report_id": "VER-###",
+  "classification": "unknown",
+  "root_cause": "",
+  "evidence": [],
+  "scope_impact": false,
+  "recommended_route": "main-gate",
+  "recommended_next_action": ""
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bounded Worker"
+  short_description: "Implement approved tasks without scope drift"
+  default_prompt: "Use $bounded-worker to implement this approved subtask and return an evidence-backed report."

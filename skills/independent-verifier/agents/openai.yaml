@@ -1,0 +1,4 @@
+interface:
+  display_name: "Independent Verifier"
+  short_description: "Verify changes against acceptance criteria"
+  default_prompt: "Use $independent-verifier to independently test this change against the requirement and approved plan."

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "id": "VER-###",
+  "requirement_id": "REQ-###",
+  "plan_id": "PLAN-###",
+  "implementation_report_id": "IMP-###",
+  "status": "pending",
+  "acceptance_criteria_results": [],
+  "tests_run": [],
+  "failures": [],
+  "evidence": [],
+  "recommended_next_action": ""
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Requirement Refiner"
+  short_description: "Turn vague ideas into testable requirements"
+  default_prompt: "Use $requirement-refiner to convert this user request into an approval-ready requirement contract."

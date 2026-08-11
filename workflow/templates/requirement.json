@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "id": "REQ-###",
+  "goal": "",
+  "must": [],
+  "must_not": [],
+  "acceptance_criteria": [],
+  "assumptions": [],
+  "unresolved": [],
+  "approved": false,
+  "approved_by": null,
+  "approved_at": null
+}

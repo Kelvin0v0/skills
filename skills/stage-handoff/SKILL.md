@@ -9,7 +9,7 @@ Use a handoff whenever work crosses a stage boundary or moves to a fresh context
 
 ## Required handoff fields
 
-Store handoffs as Markdown or JSON under `workflow/handoffs/`, using a stable ID and a descriptive filename. Include:
+Store gate-relevant handoffs as JSON under `workflow/handoffs/`, using a stable ID and a descriptive filename. Markdown may supplement a handoff for people, but JSON is the canonical machine-readable contract. Include:
 
 ```json
 {
@@ -18,6 +18,7 @@ Store handoffs as Markdown or JSON under `workflow/handoffs/`, using a stable ID
   "requirement_id": "REQ-001",
   "from_stage": "discovery",
   "to_stage": "specification",
+  "author_role": "implementation-planner",
   "status": "ready",
   "objective": "One-sentence desired outcome",
   "acceptance_criteria": ["Observable condition"],
@@ -32,6 +33,8 @@ Store handoffs as Markdown or JSON under `workflow/handoffs/`, using a stable ID
 ```
 
 Use `status: "ready"` only when the next stage has enough information to begin. Use `blocked` when a decision or artifact is missing, and `superseded` when a newer handoff replaces it. Never silently edit a completed handoff to change the requirement; create a new revision or a new handoff.
+
+The receiving specialist may consume the handoff, but only the main agent may validate it and update `workflow/state/current.json`.
 
 ## Writing rules
 

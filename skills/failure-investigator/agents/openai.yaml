@@ -1,0 +1,4 @@
+interface:
+  display_name: "Failure Investigator"
+  short_description: "Explain verification failures and recovery paths"
+  default_prompt: "Use $failure-investigator to classify this verification failure and recommend its correct recovery path."

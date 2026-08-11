@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "id": "IMP-###",
+  "requirement_id": "REQ-###",
+  "plan_id": "PLAN-###",
+  "task": "",
+  "status": "pending",
+  "summary": "",
+  "changed_files": [],
+  "tests_run": [],
+  "evidence": [],
+  "scope_change": false,
+  "blocked_by": [],
+  "recommended_next_action": ""
+}

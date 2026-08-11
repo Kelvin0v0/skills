@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "id": "PLAN-###",
+  "requirement_id": "REQ-###",
+  "approach": "",
+  "affected_components": [],
+  "steps": [],
+  "tests": [],
+  "risks": [],
+  "scope_changes": [],
+  "approved": false,
+  "approved_by": null,
+  "approved_at": null
+}

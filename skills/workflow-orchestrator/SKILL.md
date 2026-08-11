@@ -5,20 +5,22 @@ description: Coordinate multi-stage work with explicit gates, durable state, con
 
 # Workflow Orchestrator
 
-Use this skill to keep an active requirement stable while work moves through small, verifiable stages. Treat the project `AGENTS.md` as the operating contract and use the filesystem for durable state.
+Use this skill to keep an active requirement stable while work moves through small, verifiable stages. Treat the project `AGENTS.md` as the operating contract and `workflow/state/current.json` as the authoritative snapshot.
+
+The main agent alone advances workflow state. Specialists create evidence artifacts and recommendations; they never approve scope, modify `current.json`, or declare completion.
 
 ## Operating loop
 
-1. **Intake** — Restate the desired outcome, identify the active requirement, and separate in-scope work from side requests.
-2. **Discover** — Inspect the relevant files and collect evidence. Record constraints instead of guessing.
-3. **Specify** — Turn the request into observable acceptance criteria and list unresolved decisions.
-4. **Plan** — Select the smallest implementation sequence, affected files, checks, and rollback considerations.
-5. **Implement** — Make incremental changes. Keep unrelated edits untouched.
-6. **Verify** — Run focused checks after meaningful changes, then the relevant broader checks.
-7. **Review** — Compare the result against the acceptance criteria and repository standards. Review the diff for accidental scope expansion.
-8. **Complete** — Report changed artifacts, verification evidence, remaining risks, and queued follow-ups.
+1. **Intake and refine** — Use `requirement-refiner` to turn user intent into `REQ-###.json`.
+2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
+3. **Plan** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json`.
+4. **Approve plan** — Obtain the required user decision, then update `current.json`.
+5. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
+6. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
+7. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
+8. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
 
-For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Say which gates were compressed in the final handoff.
+For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Say which gates were compressed in the final handoff. Never bypass requirement and plan approval for an implementation change.
 
 ## Gate protocol
 
@@ -31,9 +33,11 @@ Before advancing a stage, record:
 
 Stop and ask for direction when an unresolved decision would materially change behavior, scope, external impact, or data safety. Do not use a later implementation decision to silently resolve an earlier requirement ambiguity.
 
+Use this gate sequence: approved requirement -> approved plan -> implementation report -> independent verification report -> completion. If a stage expands the possibility space, route it back to the main gate instead of improvising.
+
 ## Context isolation
 
-Use a fresh specialist context for substantial exploration, implementation, verification, or review when the current context is becoming noisy or the work benefits from independence. Give the specialist only:
+Use a fresh specialist context for substantial exploration, implementation, verification, or review when the current context is becoming noisy or the work benefits from independence. Use a fresh verifier context for implementation changes. Give the specialist only:
 
 - the active requirement and acceptance criteria;
 - the relevant paths or artifacts;
@@ -41,6 +45,8 @@ Use a fresh specialist context for substantial exploration, implementation, veri
 - the requested output and validation boundary.
 
 Require the specialist to return a concise structured handoff. Store large logs or generated artifacts on disk and return paths plus a distilled conclusion. Do not ask a reviewer to rely on the implementer's unfiltered reasoning.
+
+Delegate when a task is independent, bounded, or more cost-effective on a lower-capability worker. Keep a task local when delegation overhead exceeds the work, the next action depends directly on the current reasoning, or user approval is required.
 
 ## Interruption routing
 
@@ -61,6 +67,8 @@ If a specialist fails, returns an incomplete artifact, or disagrees with the act
 2. Mark the handoff as incomplete and state the missing evidence.
 3. Re-run only the missing stage or route the issue to the coordinator.
 4. Do not advance based on an ambiguous or stale handoff.
+
+If verification fails, do not immediately re-run implementation. First create a verification report and use `failure-investigator` when the cause is unclear. Route implementation defects to a bounded worker; route requirement or scope conflicts to the main gate and requirement refinement.
 
 ## Completion checklist
 
