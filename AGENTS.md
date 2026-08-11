@@ -33,7 +33,7 @@ For every root requirement, the audit enters a mandatory clarification loop
 before tickets or planning. A fresh, read-only requirement-refiner first studies
 the cited specification and the coordinator-approved repository source and
 tests, then writes the draft, concise findings, audit, and ranked material user
-questions. For each `needs user input`, the coordinator uses `$grill-me`: ask
+questions. For each `needs user input`, the coordinator uses `$requirement-interview`: ask
 exactly one decision question, include a recommended answer and brief reason,
 wait for the answer, record it in the requirement artifact, then re-run the
 audit in a fresh refiner context.

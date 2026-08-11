@@ -28,7 +28,7 @@ read unrelated areas, or use external sources unless explicitly allowed.
 6. Separate mandatory behavior, exclusions, assumptions, and unresolved decisions.
 7. Write observable acceptance criteria.
 8. Create or revise `workflow/requirements/REQ-###.json` from `workflow/templates/requirement.json`, including the research findings, audit, and interview answers received so far.
-9. Return the contract, next interview question or `none`, and artifact path to the coordinator. Only the coordinator uses `$grill-me` to ask the user, records approval, or advances the workflow.
+9. Return the contract, next interview question or `none`, and artifact path to the coordinator. Only the coordinator uses `$requirement-interview` to ask the user, records approval, or advances the workflow.
 
 ## Contract rules
 

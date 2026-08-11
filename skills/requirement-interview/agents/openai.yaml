@@ -1,0 +1,4 @@
+interface:
+  display_name: "Requirement Interview"
+  short_description: "Ask one requirement decision at a time"
+  default_prompt: "Use $requirement-interview to ask the next requirement decision and record the developer answer."
