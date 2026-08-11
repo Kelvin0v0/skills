@@ -15,7 +15,7 @@ Read the approved requirement, approved plan, implementation report, actual diff
 
 1. Map every acceptance criterion to evidence, a test, or an explicit failure.
 2. Run focused checks and relevant broader checks in proportion to risk.
-3. Inspect the diff for scope expansion, regressions, and unverified claims.
+3. Inspect the diff for scope expansion, regressions, unverified claims, and whether the plan's reuse decision was followed without unnecessary duplication.
 4. Write `workflow/reports/VER-###.json` from `workflow/templates/verification-report.json`.
 5. Return `pass` or `fail` plus evidence and one recommended next action.
 

@@ -6,6 +6,8 @@
   "plan_id": "PLAN-###",
   "implementation_report_id": "IMP-###",
   "status": "pending",
+  "reuse_decision_followed": null,
+  "reuse_decision_evidence": [],
   "acceptance_criteria_results": [],
   "tests_run": [],
   "failures": [],

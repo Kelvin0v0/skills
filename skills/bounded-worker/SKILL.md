@@ -9,7 +9,7 @@ Implement only the assigned task from an approved requirement and plan. Optimize
 
 ## Required inputs
 
-Read the approved `REQ-###.json`, approved `PLAN-###.json`, assigned subtask, relevant paths, and validation boundary. If either approval is absent, stop and return a blocked handoff.
+Read the approved `REQ-###.json`, approved `PLAN-###.json` including its reuse decision, assigned subtask, relevant paths, and validation boundary. If either approval is absent, stop and return a blocked handoff.
 
 ## Process
 
@@ -23,5 +23,6 @@ Read the approved `REQ-###.json`, approved `PLAN-###.json`, assigned subtask, re
 
 - Do not alter the requirement, plan, `current.json`, or approval fields.
 - Do not absorb a side request or a discovered enhancement into the task.
+- Follow the plan's reuse decision; report a scope conflict instead of creating a parallel mechanism.
 - Mark a possible scope change in the report and return it to the main agent.
 - Do not claim the full requirement is complete; the independent verifier decides whether the evidence supports it.

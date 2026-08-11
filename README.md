@@ -95,6 +95,15 @@ remove the need for appropriate verification.
 | `standard` | Normal product or code change | Requirement, tickets, selected-ticket plan, bounded implementation, independent verification. |
 | `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, and extra evidence where needed. |
 
+## Reuse decision
+
+Every selected-ticket plan records the existing feature or generic mechanism,
+the files and symbols checked, a `reuse`, `extend`, `replace`, or `create_new`
+decision, and its reason. This is part of normal plan approval, not a separate
+gate. Use a read-only investigation only when the planner cannot establish the
+decision from repository evidence. Implementation follows the decision; the
+independent verifier checks it and reports unnecessary duplication.
+
 ## Repository contents
 
 | Path | Purpose |
@@ -127,7 +136,7 @@ This is controlled context rehydration: the main agent knows where information l
 
 1. Use `workflow/templates/requirement.json` to create `workflow/requirements/REQ-###.json`.
 2. After requirement approval, create dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
-3. Select one ticket and create its `workflow/plans/PLAN-###.json` artifact; obtain plan approval.
+3. Select one ticket and create its `workflow/plans/PLAN-###.json` artifact, including its reuse decision; obtain plan approval.
 4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
 5. Independently verify it in `workflow/reports/VER-###.json`.
 6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.

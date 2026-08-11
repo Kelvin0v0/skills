@@ -3,6 +3,13 @@
   "id": "PLAN-###",
   "requirement_id": "REQ-###",
   "ticket_id": "TICKET-###",
+  "reuse_decision": {
+    "existing_feature_or_mechanism": "",
+    "files_and_symbols_checked": [],
+    "decision": "undecided",
+    "reason": "",
+    "investigation_report_id": null
+  },
   "approach": "",
   "affected_components": [],
   "steps": [],
