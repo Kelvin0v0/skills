@@ -14,7 +14,7 @@ The main agent is a coordinator: it advances workflow state and makes user-facin
 1. **Audit and refine** — Use `requirement-refiner` to turn user intent into `REQ-###.json`; route material evidence needs to a read-only evidence worker.
 2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
 3. **Create tickets** — Create dependency-aware tickets from the approved requirement.
-4. **Plan one ticket** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json` for the selected ticket.
+4. **Plan one ticket** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
 5. **Approve plan** — Obtain the required user decision, then update `current.json`.
 6. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
 7. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.

@@ -18,7 +18,7 @@ flowchart TD
         G1 -->|Needs refinement| S1
         G1 -->|Approved| S4[Step 4: Create high-level tickets<br/>Output: ordered, dependency-aware subtasks]
         S4 --> S5[Step 5: Select one ticket<br/>Rule: keep all other work out of active context]
-        S5 --> S6[Step 6: Plan the selected ticket<br/>Inherit root audit; delta audit only for new uncertainty]
+        S5 --> S6[Step 6: Plan the selected ticket<br/>Inherit root audit; delta audit only for new uncertainty<br/>Add focused code context and design graph when useful]
         S6 --> G2{Step 7: User approves the plan?<br/>Decision: build it this way?}
         G2 -->|Needs revision| S6
         G2 -->|Approved| S8[Step 8: Implement only the approved ticket<br/>Output: code changes and self-check evidence]
@@ -124,9 +124,9 @@ remove the need for appropriate verification.
 
 | Profile | Use it for | Required shape |
 | --- | --- | --- |
-| `light` | Small, low-risk work | One compact ticket and plan; focused verification; subagents only when useful. |
-| `standard` | Normal product or code change | Requirement, tickets, selected-ticket plan, bounded implementation, independent verification. |
-| `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, and extra evidence where needed. |
+| `light` | Small, low-risk work | One compact ticket and plan; focused verification; no plan visuals unless requested. |
+| `standard` | Normal product or code change | Requirement, tickets, selected-ticket plan, bounded implementation, independent verification; visuals when flow crosses components or is unclear. |
+| `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, extra evidence, and required plan visuals. |
 
 ## Implementation contract
 
@@ -142,6 +142,18 @@ evidence supports it; otherwise set `no_future_generalisation`. Workers choose
 ordinary local names and private helpers, but return to planning for a material
 change to behavior, reuse/design, API/data/permissions/migration, scope, risk,
 or boundaries. Independent verification checks the whole contract.
+
+## Plan visuals
+
+Plan visuals help a developer approve the design before implementation; they
+do not add another approval gate. Use a short code box to show the relevant
+current path or symbol and the intended change. Use a small Mermaid graph to
+show components and the changed control or data flow. Do not paste full files,
+use a graph for a one-file local edit, or present speculative final code.
+
+`complex` plans require both visuals. `standard` plans include them when the
+change crosses components or the flow is unclear. `light` plans omit them
+unless requested. Store them in `plan_visuals` in the selected ticket plan.
 
 ## Repository contents
 

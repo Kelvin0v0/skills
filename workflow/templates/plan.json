@@ -31,6 +31,23 @@
       "scope_risk_or_boundaries"
     ]
   },
+  "plan_visuals": {
+    "status": "not_needed",
+    "reason": "",
+    "code_context": [
+      {
+        "path": "",
+        "symbol": "",
+        "current_excerpt": "",
+        "intended_change": ""
+      }
+    ],
+    "design_graph": {
+      "format": "mermaid",
+      "source": "",
+      "explains": []
+    }
+  },
   "approach": "",
   "affected_components": [],
   "steps": [],

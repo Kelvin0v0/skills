@@ -51,6 +51,11 @@ boundaries, and checks. Workers may choose normal local names and private
 helpers. Return to planning only when implementation would materially change
 behavior, reuse/design, API/data/permissions/migration, scope, risk, or boundaries.
 
+Plan visuals are part of that plan, not another gate: require focused code
+context and a small design graph for `complex` work; use them for `standard`
+work when a change crosses components or the flow would otherwise be unclear.
+Omit them for `light` work unless the developer requests them.
+
 ## Subagents
 
 Delegate in a fresh, bounded subagent context only when work needs independent
