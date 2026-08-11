@@ -23,6 +23,10 @@ risks, and any relevant integration, data, permission, or migration impact.
 Do not advance while a material uncertainty needs user input or investigation;
 an unknown is not resolved merely because no question was asked.
 
+The first or root requirement always receives this full audit. A ticket or
+subtask derived from an approved requirement inherits it and runs a delta audit
+only when planning or investigation exposes new material uncertainty.
+
 ## Delivery profile
 
 At requirement approval, the main agent sets `delivery_profile` to `light`,

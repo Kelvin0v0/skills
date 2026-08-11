@@ -18,7 +18,7 @@ flowchart TD
         G1 -->|Needs refinement| S1
         G1 -->|Approved| S4[Step 4: Create high-level tickets<br/>Output: ordered, dependency-aware subtasks]
         S4 --> S5[Step 5: Select one ticket<br/>Rule: keep all other work out of active context]
-        S5 --> S6[Step 6: Plan the selected ticket<br/>Output: repository-grounded changes and checks]
+        S5 --> S6[Step 6: Plan the selected ticket<br/>Inherit root audit; delta audit only for new uncertainty]
         S6 --> G2{Step 7: User approves the plan?<br/>Decision: build it this way?}
         G2 -->|Needs revision| S6
         G2 -->|Approved| S8[Step 8: Implement only the approved ticket<br/>Output: code changes and self-check evidence]
@@ -97,6 +97,10 @@ Do not advance merely because the agent cannot think of another question. A
 material unknown must be resolved, recorded as an approval-needed assumption,
 or routed to targeted user input or bounded investigation.
 
+The first or root requirement always receives the full audit. Tickets and
+subtasks created from that approved requirement inherit it; they run a delta
+audit only when planning or investigation exposes new material uncertainty.
+
 ## Delivery profiles
 
 The main agent selects a profile at requirement approval and may revise it only
@@ -157,7 +161,7 @@ This is controlled context rehydration: the main agent knows where information l
 
 1. Use `workflow/templates/requirement.json` to create `workflow/requirements/REQ-###.json`.
 2. After requirement approval, create dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
-3. Select one ticket, repeat the uncertainty audit after repository inspection, and create its `workflow/plans/PLAN-###.json` artifact, including its implementation contract; obtain plan approval.
+3. Select one ticket, run a delta audit only for new material uncertainty exposed by repository inspection, and create its `workflow/plans/PLAN-###.json` artifact, including its implementation contract; obtain plan approval.
 4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
 5. Independently verify it in `workflow/reports/VER-###.json`.
 6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.

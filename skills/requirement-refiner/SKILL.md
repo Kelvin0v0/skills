@@ -20,6 +20,7 @@ Convert user intent into a durable requirement contract. Clarify **what** the us
 ## Contract rules
 
 - Keep the contract concise; do not copy conversation history or speculative implementation details.
+- This full audit applies to a root requirement. Derived tickets and subtasks inherit it and use a delta audit only for new material uncertainty.
 - Mark every behavior-changing uncertainty in `unresolved`.
 - Do not treat an unknown as resolved merely because no question was asked.
 - Use `must_not` for explicit scope boundaries.
