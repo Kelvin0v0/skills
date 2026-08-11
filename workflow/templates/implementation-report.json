@@ -8,6 +8,7 @@
   "status": "pending",
   "summary": "",
   "reuse_decision_followed": null,
+  "implementation_contract_followed": null,
   "changed_files": [],
   "tests_run": [],
   "evidence": [],

@@ -10,6 +10,27 @@
     "reason": "",
     "investigation_report_id": null
   },
+  "implementation_contract": {
+    "acceptance_criteria_ids": [],
+    "design_tradeoffs": [],
+    "expected_files_and_symbols": [],
+    "boundaries": {
+      "in_scope": [],
+      "non_goals": []
+    },
+    "future_posture": {
+      "known_variations": [],
+      "decision": "no_future_generalisation",
+      "evidence": []
+    },
+    "required_checks": [],
+    "return_triggers": [
+      "behavior_or_acceptance_criteria",
+      "reuse_decision_or_architecture",
+      "api_data_permissions_or_migration",
+      "scope_risk_or_boundaries"
+    ]
+  },
   "approach": "",
   "affected_components": [],
   "steps": [],

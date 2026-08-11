@@ -21,6 +21,13 @@ At requirement approval, the main agent sets `delivery_profile` to `light`,
 or risk changes. Profiles control artifact detail and delegation, not authority
 or the need for appropriate verification.
 
+## Implementation boundary
+
+An approved ticket plan defines its material behavior, reuse/design decision,
+boundaries, and checks. Workers may choose normal local names and private
+helpers. Return to planning only when implementation would materially change
+behavior, reuse/design, API/data/permissions/migration, scope, risk, or boundaries.
+
 ## Subagents
 
 Delegate in a fresh, bounded subagent context only when work needs independent

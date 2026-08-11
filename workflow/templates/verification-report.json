@@ -8,6 +8,8 @@
   "status": "pending",
   "reuse_decision_followed": null,
   "reuse_decision_evidence": [],
+  "implementation_contract_followed": null,
+  "implementation_contract_evidence": [],
   "acceptance_criteria_results": [],
   "tests_run": [],
   "failures": [],
