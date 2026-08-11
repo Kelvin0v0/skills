@@ -27,6 +27,22 @@ The first or root requirement always receives this full audit. A ticket or
 subtask derived from an approved requirement inherits it and runs a delta audit
 only when planning or investigation exposes new material uncertainty.
 
+## Mandatory requirement interview
+
+For every root requirement, the audit enters a mandatory clarification loop
+before tickets or planning. A fresh requirement-refiner writes the draft,
+audit, and ranked material user questions. For each `needs user input`, the
+coordinator uses `$grill-me`: ask exactly one decision question, include a
+recommended answer and brief reason, wait for the answer, record it in the
+requirement artifact, then re-run the audit in a fresh refiner context.
+
+Do not ask the user for discoverable facts; assign evidence work first. The
+loop closes only when no material question remains, every assumption is
+explicitly approved, and every assigned investigation has returned a
+conclusion. If the root audit finds no user question, record that result and
+continue; the mandatory stage is the audit and interview protocol, not needless
+questioning.
+
 ## Coordinator evidence boundary
 
 The coordinator may read user input and workflow artifacts only. It must not

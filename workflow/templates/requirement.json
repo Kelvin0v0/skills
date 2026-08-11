@@ -11,7 +11,12 @@
   "clarification_audit": {
     "status": "pending",
     "checked_areas": [],
-    "material_uncertainties": []
+    "material_uncertainties": [],
+    "interview": {
+      "status": "not_started",
+      "next_question": null,
+      "answers": []
+    }
   },
   "approved": false,
   "approved_by": null,

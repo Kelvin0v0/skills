@@ -8,10 +8,10 @@ It is designed for four practical problems: context overload in the main chat, w
 
 ```mermaid
 flowchart TD
-    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Mandatory uncertainty audit]
+    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Mandatory audit and ranked questions]
     subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
         S1 --> A1{Every material uncertainty routed?}
-        A1 -->|Needs user input| Q1[Ask a targeted question] --> S1
+        A1 -->|Needs user input| Q1[Mandatory grill-me loop<br/>One decision question + recommendation] --> S1
         A1 -->|Needs investigation| I1[Assign read-only evidence worker<br/>Requirement, repository, and/or external evidence] --> S1
         A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: REQ, acceptance criteria, exclusions, and audit]
         S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
@@ -54,11 +54,12 @@ flowchart TD
 ```
 
 The numbered path is the normal flow. Requirement refinement, ticket breakdown,
-and planning run in fresh worker contexts; the coordinator only routes work,
-summarizes artifacts for the user, records approval, and advances state. The
-lower routes show what happens when the user interrupts it: answer a harmless
-clarification, queue separate work, investigate an active-ticket failure, or
-suspend work for an urgent blocker.
+and planning run in fresh worker contexts. The coordinator runs the mandatory
+one-question-at-a-time `$grill-me` loop for material user decisions, summarizes
+artifacts, records approval, and advances state. The lower routes show what
+happens when the user interrupts it: answer a harmless clarification, queue
+separate work, investigate an active-ticket failure, or suspend work for an
+urgent blocker.
 
 ## Two-dice theory: shrink the possibility space
 
@@ -90,17 +91,25 @@ If a downstream agent discovers evidence that creates new ambiguity or expands s
 - Non-blocking questions, bugs, and ideas go to `queue.json`; they cannot silently modify the active requirement.
 - Large reasoning traces remain in artifacts. The coordinator context receives concise conclusions and paths only.
 
-## Mandatory uncertainty audit
+## Mandatory uncertainty audit and interview
 
-Clarification is mandatory, but asking a question is not automatic. Before a
-requirement can move forward, classify each material uncertainty as resolved,
-an assumption requiring approval, needs user input, or needs investigation. The
+Every root requirement begins with a mandatory audit and clarification loop.
+The fresh refiner classifies each material uncertainty as resolved, an
+assumption requiring approval, needs user input, or needs investigation. The
 audit covers behavior and acceptance criteria, scope and non-goals, constraints
 and risks, and relevant integration, data, permission, or migration impact.
 
-Do not advance merely because the agent cannot think of another question. A
-material unknown must be resolved, recorded as an approval-needed assumption,
-or routed to targeted user input or bounded investigation.
+For each material user decision, the coordinator uses `$grill-me` to ask one
+question at a time, including a recommended answer and brief reason. After each
+answer, a fresh refiner updates the requirement audit. Do not ask for facts an
+evidence worker can discover. The loop closes only when no material user
+question remains, assumptions are explicitly approved, and every bounded
+investigation has returned a conclusion; tickets and planning remain blocked
+until then.
+
+If the audit finds no material user question, record that clean result and
+continue. This prevents pointless interviews while keeping clarification itself
+mandatory.
 
 The first or root requirement always receives the full audit. Tickets and
 subtasks created from that approved requirement inherit it; they run a delta
@@ -166,6 +175,7 @@ unless requested. Store them in `plan_visuals` in the selected ticket plan.
 | --- | --- |
 | [`AGENTS.md`](AGENTS.md) | Operating contract, state ownership, role boundaries, and approval gates. |
 | [`skills/workflow-orchestrator`](skills/workflow-orchestrator/SKILL.md) | Coordinates state, gates, delegation, recovery, and completion. |
+| `$grill-me` (installed Codex skill) | Runs the mandatory one-question-at-a-time root-requirement interview in the coordinator chat. |
 | [`skills/requirement-refiner`](skills/requirement-refiner/SKILL.md) | Converts vague ideas into approval-ready requirement contracts. |
 | [`skills/story-breakdown`](skills/story-breakdown/SKILL.md) | Splits an approved requirement into dependency-aware tickets. |
 | [`skills/implementation-planner`](skills/implementation-planner/SKILL.md) | Produces repository-grounded plans from approved requirements. |
