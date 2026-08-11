@@ -1,11 +1,15 @@
 ---
 name: failure-investigator
-description: Classify a failed verification and recommend the correct recovery path without silently repairing or redefining scope. Use when verification fails, requirements conflict with codebase reality, or the main agent needs evidence to route work back to a worker or upward to refinement.
+description: Gather bounded evidence for a failed verification or other material uncertainty and recommend the correct route without silently repairing or redefining scope. Use when verification fails, requirements conflict with codebase reality, or a coordinator needs repository or external evidence before routing work.
 ---
 
-# Failure Investigator
+# Evidence and Failure Investigator
 
-Investigate a failed verification as a routing problem. Produce evidence for the main agent; do not decide the next phase yourself.
+Produce evidence for the coordinator; do not decide the next phase yourself.
+
+## General evidence task
+
+For `needs_investigation`, read the assigned question, evidence levels, allowed sources, and stop condition from `INV-###.json`. Gather only the requested evidence, preferring approved artifacts, then repository source and tests, then official external documentation. Record the conclusion, evidence, impact, and recommended route. If unresolved at the stop condition, return a precise user question or blocked report.
 
 ## Process
 
@@ -13,7 +17,7 @@ Investigate a failed verification as a routing problem. Produce evidence for the
 2. Classify the cause as one of: `implementation_defect`, `requirement_scope_conflict`, `environment`, or `unknown`.
 3. Identify the root cause, evidence, scope impact, and the narrowest safe recovery path.
 4. Write `workflow/reports/INV-###.json` from `workflow/templates/investigation-report.json`.
-5. Return the report to the main agent.
+5. Return the report to the coordinator.
 
 ## Routing rules
 

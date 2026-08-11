@@ -1,4 +1,4 @@
 interface:
-  display_name: "Failure Investigator"
-  short_description: "Explain verification failures and recovery paths"
-  default_prompt: "Use $failure-investigator to classify this verification failure and recommend its correct recovery path."
+  display_name: "Evidence Investigator"
+  short_description: "Gather bounded evidence and recommend the next route"
+  default_prompt: "Use $failure-investigator to gather bounded evidence for this material uncertainty and recommend the next route."

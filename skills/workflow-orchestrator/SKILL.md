@@ -7,18 +7,19 @@ description: Coordinate multi-stage work with explicit gates, durable state, con
 
 Use this skill to keep an active requirement stable while work moves through small, verifiable stages. Treat the project `AGENTS.md` as the operating contract and `workflow/state/current.json` as the authoritative snapshot.
 
-The main agent alone advances workflow state. Specialists create evidence artifacts and recommendations; they never approve scope, modify `current.json`, or declare completion.
+The main agent is a coordinator: it advances workflow state and makes user-facing decisions, but does not investigate source code, run tests, reproduce defects, browse external sources, or make technical design decisions. Specialists create evidence artifacts and recommendations; they never approve scope, modify `current.json`, or declare completion.
 
 ## Operating loop
 
-1. **Intake and refine** — Use `requirement-refiner` to turn user intent into `REQ-###.json`.
+1. **Audit and refine** — Use `requirement-refiner` to turn user intent into `REQ-###.json`; route material evidence needs to a read-only evidence worker.
 2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
-3. **Plan** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json`.
-4. **Approve plan** — Obtain the required user decision, then update `current.json`.
-5. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
-6. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
-7. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
-8. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
+3. **Create tickets** — Create dependency-aware tickets from the approved requirement.
+4. **Plan one ticket** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json` for the selected ticket.
+5. **Approve plan** — Obtain the required user decision, then update `current.json`.
+6. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
+7. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
+8. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
+9. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
 
 For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Say which gates were compressed in the final handoff. Never bypass requirement and plan approval for an implementation change.
 
@@ -46,7 +47,18 @@ Use a fresh specialist context for substantial exploration, implementation, veri
 
 Require the specialist to return a concise structured handoff. Store large logs or generated artifacts on disk and return paths plus a distilled conclusion. Do not ask a reviewer to rely on the implementer's unfiltered reasoning.
 
-Delegate when a task is independent, bounded, or more cost-effective on a lower-capability worker. Keep a task local when delegation overhead exceeds the work, the next action depends directly on the current reasoning, or user approval is required.
+Delegate when a task needs evidence, is independent, bounded, or more cost-effective on a lower-capability worker. Keep only user decisions, routing, and workflow administration with the coordinator.
+
+## Evidence assignments
+
+For a material unknown, the coordinator creates a bounded, read-only evidence assignment instead of investigating itself. Record it in `INV-###.json` with:
+
+- the exact question and evidence level: `requirement`, `repository`, `external`, or a combination;
+- allowed sources and a stop condition;
+- evidence and a conclusion about the active requirement or ticket;
+- a recommended route: continue, ask the user, refine the requirement, re-plan, or remain blocked.
+
+Gather evidence in this order: approved artifacts, repository source and tests, then official external documentation. If the assignment cannot resolve the question within scope, return a precise user question or blocked report; do not continue researching indefinitely.
 
 ## Interruption routing
 

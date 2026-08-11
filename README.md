@@ -1,6 +1,6 @@
 # Context-Aware Agent Workflow
 
-This repository is a Git-versioned starter kit for a progressive-constraint workflow: the main agent owns state and decisions, while disposable specialists produce bounded evidence in clean contexts.
+This repository is a Git-versioned starter kit for a progressive-constraint workflow: the coordinator owns state and decisions, while disposable specialists produce bounded evidence in clean contexts.
 
 It is designed for four practical problems: context overload in the main chat, workflow drift from side conversations, unnecessary use of expensive agents for bounded work, and coding from unrefined abstract ideas.
 
@@ -12,7 +12,7 @@ flowchart TD
     subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
         S1 --> A1{Every material uncertainty routed?}
         A1 -->|Needs user input| Q1[Ask a targeted question] --> S1
-        A1 -->|Needs investigation| I1[Run bounded investigation] --> S1
+        A1 -->|Needs investigation| I1[Assign read-only evidence worker<br/>Requirement, repository, and/or external evidence] --> S1
         A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: acceptance criteria, exclusions, and audit]
         S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
         G1 -->|Needs refinement| S1
@@ -28,9 +28,9 @@ flowchart TD
     end
 
     ST[(current.json: active work and approvals)]
-    G1 -. main agent records decision .-> ST
-    G2 -. main agent records decision .-> ST
-    S10 -. main agent records completion .-> ST
+    G1 -. coordinator records decision .-> ST
+    G2 -. coordinator records decision .-> ST
+    S10 -. coordinator records completion .-> ST
 
     IN[New user input during any active step] --> C{Classify: does it change active work?}
     C -->|Clarification only| A[Answer without changing scope] --> R[Resume the same active step]
@@ -40,12 +40,12 @@ flowchart TD
     C -->|Unrelated bug| QB[Queue it as separate work]
     QB --> BT[When chosen later: start Step 1 audit for its own work]
     BT --> S1
-    C -->|Bug fails active acceptance criteria| I[Investigate or reproduce<br/>Output: evidence and likely cause]
+    C -->|Bug fails active acceptance criteria| I[Assign evidence worker to investigate or reproduce<br/>Output: evidence and likely cause]
     I --> P{Does the approved plan already cover repair?}
     P -->|Yes| S8
     P -->|No: scope changed| S1
     C -->|Safety, data-loss, or production blocker| X[Suspend active work<br/>Handle the urgent risk first]
-    X -. main agent records suspension .-> ST
+    X -. coordinator records suspension .-> ST
     X --> D{Recovery decision}
     D -->|Resume| R
     D -->|Scope changed| S1
@@ -53,7 +53,7 @@ flowchart TD
     S1 -. work in progress .-> IN
 ```
 
-The numbered path is the normal flow. The lower routes show what happens when the user interrupts it: answer a harmless clarification, queue separate work, investigate an active-ticket failure, or suspend work for an urgent blocker. The main agent alone records each state change.
+The numbered path is the normal flow. The lower routes show what happens when the user interrupts it: answer a harmless clarification, queue separate work, investigate an active-ticket failure, or suspend work for an urgent blocker. The coordinator alone records each state change.
 
 ## Two-dice theory: shrink the possibility space
 
@@ -78,12 +78,12 @@ If a downstream agent discovers evidence that creates new ambiguity or expands s
 
 ## Core rules
 
-- Only the main agent may approve a requirement or plan, update `current.json`, advance a phase, or declare completion.
+- Only the coordinator may approve a requirement or plan, update `current.json`, advance a phase, or declare completion.
 - Workers may implement only approved, bounded tasks. Their reports are evidence, not authorization.
 - Independent verification evaluates the actual diff against acceptance criteria; it does not trust implementation claims.
 - Verification failures are investigated before rework, separating an implementation defect from a requirement or scope conflict.
 - Non-blocking questions, bugs, and ideas go to `queue.json`; they cannot silently modify the active requirement.
-- Large reasoning traces remain in artifacts. The main context receives concise conclusions and paths only.
+- Large reasoning traces remain in artifacts. The coordinator context receives concise conclusions and paths only.
 
 ## Mandatory uncertainty audit
 
@@ -101,9 +101,23 @@ The first or root requirement always receives the full audit. Tickets and
 subtasks created from that approved requirement inherit it; they run a delta
 audit only when planning or investigation exposes new material uncertainty.
 
+## Coordinator and evidence workers
+
+The coordinator is not an investigator or technical planner. It
+reads user input and workflow artifacts, then routes material evidence needs to
+a read-only worker. The worker receives an exact question, evidence level,
+allowed sources, stop condition, and report path; it returns only evidence,
+conclusion, impact, and recommended route.
+
+Evidence levels are `requirement`, `repository`, and `external`; combine them
+only when necessary. Use sources in this order: approved artifacts, repository
+source and tests, then official external documentation. If the worker cannot
+resolve the question within its scope, it returns a precise user question or a
+blocked report rather than investigating indefinitely.
+
 ## Delivery profiles
 
-The main agent selects a profile at requirement approval and may revise it only
+The coordinator selects a profile at requirement approval and may revise it only
 at a later gate when scope or risk changes. The profile controls how much
 documentation and delegation is useful; it does not transfer state authority or
 remove the need for appropriate verification.
@@ -139,7 +153,7 @@ or boundaries. Independent verification checks the whole contract.
 | [`skills/implementation-planner`](skills/implementation-planner/SKILL.md) | Produces repository-grounded plans from approved requirements. |
 | [`skills/bounded-worker`](skills/bounded-worker/SKILL.md) | Implements an approved subtask without scope drift. |
 | [`skills/independent-verifier`](skills/independent-verifier/SKILL.md) | Independently verifies a change against requirements and plan. |
-| [`skills/failure-investigator`](skills/failure-investigator/SKILL.md) | Routes verification failures to worker remediation or requirement refinement. |
+| [`skills/failure-investigator`](skills/failure-investigator/SKILL.md) | Gathers bounded evidence for failures or material uncertainty and recommends routing. |
 | [`skills/stage-handoff`](skills/stage-handoff/SKILL.md) | Defines compact, machine-readable cross-context contracts. |
 | [`skills/interruption-queue`](skills/interruption-queue/SKILL.md) | Classifies and records side questions, bugs, ideas, and follow-ups. |
 | [`workflow/state/current.json`](workflow/state/current.json) | Small authoritative snapshot of the active workflow. |
@@ -155,7 +169,7 @@ Keep three kinds of information separate:
 | `workflow/state/current.json` | What is true now: phase, approvals, next action | Yes |
 | Requirement, plan, handoff, and report artifacts | Evidence, detailed findings, and history | Load only when needed |
 
-This is controlled context rehydration: the main agent knows where information lives and loads only the artifact required for the next decision.
+This is controlled context rehydration: the coordinator knows where information lives and loads only the artifact required for the next decision.
 
 ## Artifact flow
 
@@ -169,7 +183,7 @@ This is controlled context rehydration: the main agent knows where information l
 
 ## Delegation policy
 
-Delegate only when the work needs independent evidence, is safely independent, or would fill the main context. Keep work with the main agent when it is small, directly tied to a current decision, or needs user approval.
+Delegate only when the work needs independent evidence, is safely independent, or would fill the coordinator context. Keep user decisions, routing, and workflow administration with the coordinator.
 
 The architecture does not require every role to be a separate agent on every task. The invariant is the contracts and gates, not the number of agents.
 

@@ -1,7 +1,12 @@
 {
   "schema_version": "1.0",
   "id": "INV-###",
-  "verification_report_id": "VER-###",
+  "investigation_kind": "failure",
+  "verification_report_id": null,
+  "question": "",
+  "evidence_levels": [],
+  "allowed_sources": [],
+  "stop_condition": "",
   "classification": "unknown",
   "root_cause": "",
   "evidence": [],

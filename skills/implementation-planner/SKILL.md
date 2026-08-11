@@ -18,7 +18,7 @@ Read the approved `REQ-###.json`, relevant repository files, and `workflow/state
 3. Record the implementation contract: acceptance-criterion references, design trade-offs, expected files and symbols, boundaries, required checks, and future posture.
 4. Record future posture only for a known variation supported by repository, ticket, or user evidence; otherwise set `no_future_generalisation`.
 5. Inherit the approved root requirement's audit. Run a delta audit only for a new material behavior, scope, reuse/design, integration, data, permission, migration, risk, or boundary uncertainty exposed by inspection. Route user-intent uncertainty to requirement refinement, ticket-scope uncertainty to ticket decomposition, and technical uncertainty to bounded investigation.
-6. If repository evidence is insufficient, use a read-only investigation only as needed; record its report ID. Do not invent a candidate or delegate by default.
+6. If evidence is needed, create a bounded read-only assignment with the question, evidence level, allowed sources, stop condition, and report path. Prefer approved artifacts, then repository evidence, then official external sources only when needed. Do not ask the coordinator to research.
 7. Create `workflow/plans/PLAN-###.json` from `workflow/templates/plan.json`.
 8. List the approach, affected components, ordered steps, tests, risks, and any scope conflict.
 9. Return the plan to the main agent for approval only when no material uncertainty remains.

@@ -2,7 +2,7 @@
 
 ## Authority
 
-Only the main agent may update `workflow/state/current.json`, change scope,
+The coordinator is the main agent. Only the coordinator may update `workflow/state/current.json`, change scope,
 approve a requirement or plan, suspend or resume work, or declare completion.
 
 ## Required flow
@@ -27,9 +27,19 @@ The first or root requirement always receives this full audit. A ticket or
 subtask derived from an approved requirement inherits it and runs a delta audit
 only when planning or investigation exposes new material uncertainty.
 
+## Coordinator evidence boundary
+
+The coordinator may read user input and workflow artifacts only. It must not
+search product source, run tests, reproduce defects, browse external sources,
+or make technical design decisions. When material evidence is needed, assign a
+read-only evidence worker with its question, evidence level (`requirement`,
+`repository`, `external`, or a combination), allowed sources, stop condition,
+and required report. Prefer approved artifacts, then repository evidence, then
+official external sources; use external sources only when earlier evidence is insufficient.
+
 ## Delivery profile
 
-At requirement approval, the main agent sets `delivery_profile` to `light`,
+At requirement approval, the coordinator sets `delivery_profile` to `light`,
 `standard`, or `complex`. It may revise the profile only at a gate when scope
 or risk changes. Profiles control artifact detail and delegation, not authority
 or the need for appropriate verification.
@@ -44,14 +54,14 @@ behavior, reuse/design, API/data/permissions/migration, scope, risk, or boundari
 ## Subagents
 
 Delegate in a fresh, bounded subagent context only when work needs independent
-evidence, is safely independent, or would distract the main context.
+evidence, is safely independent, or would distract the coordinator context.
 
 Give a subagent only the relevant artifact paths, explicit scope, and required
 output. It returns artifact paths, concise evidence, risks or blocks, and a
 recommended next action. It cannot update state, approvals, scope, or completion.
 
 Keep user decisions, tiny work, routing, and all workflow-state changes with
-the main agent.
+the coordinator.
 
 ## Durable state
 
@@ -68,7 +78,7 @@ Classify input before changing active work:
 - New requirement or unrelated bug: queue it; it must become its own approved work later.
 - Active-ticket failure: verify, investigate, repair only if the plan covers it,
   then verify again in a fresh context; otherwise return to requirement approval.
-- Safety or production blocker: suspend active work and let the main agent route recovery.
+- Safety or production blocker: suspend active work and let the coordinator route recovery.
 
 Queued items never silently modify the active requirement or ticket.
 
