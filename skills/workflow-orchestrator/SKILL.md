@@ -11,7 +11,7 @@ The main agent is a coordinator: it advances workflow state and makes user-facin
 
 ## Operating loop
 
-1. **Audit and interview** — Start a fresh `requirement-refiner` worker to turn user intent into `REQ-###.json`; route material evidence needs to a fresh read-only evidence worker. For each material user decision, use `$grill-me` in the coordinator chat: ask one question with a recommendation, wait, record the answer, then re-run the fresh refiner. Do not start tickets until this loop closes.
+1. **Research, audit, and interview** — Start a fresh, read-only `requirement-refiner` worker with a cited-specification, repository-source, and test boundary to turn user intent into `REQ-###.json`. Route research beyond that boundary to a fresh evidence worker. For each material user decision, use `$grill-me` in the coordinator chat: ask one question with a recommendation, wait, record the answer, then re-run the fresh refiner. Do not start tickets until this loop closes.
 2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
 3. **Create tickets** — Start a fresh `story-breakdown` worker to create dependency-aware tickets from the approved requirement.
 4. **Plan one ticket** — Start a fresh `implementation-planner` worker to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.

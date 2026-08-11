@@ -30,18 +30,21 @@ only when planning or investigation exposes new material uncertainty.
 ## Mandatory requirement interview
 
 For every root requirement, the audit enters a mandatory clarification loop
-before tickets or planning. A fresh requirement-refiner writes the draft,
-audit, and ranked material user questions. For each `needs user input`, the
-coordinator uses `$grill-me`: ask exactly one decision question, include a
-recommended answer and brief reason, wait for the answer, record it in the
-requirement artifact, then re-run the audit in a fresh refiner context.
+before tickets or planning. A fresh, read-only requirement-refiner first studies
+the cited specification and the coordinator-approved repository source and
+tests, then writes the draft, concise findings, audit, and ranked material user
+questions. For each `needs user input`, the coordinator uses `$grill-me`: ask
+exactly one decision question, include a recommended answer and brief reason,
+wait for the answer, record it in the requirement artifact, then re-run the
+audit in a fresh refiner context.
 
-Do not ask the user for discoverable facts; assign evidence work first. The
-loop closes only when no material question remains, every assumption is
-explicitly approved, and every assigned investigation has returned a
-conclusion. If the root audit finds no user question, record that result and
-continue; the mandatory stage is the audit and interview protocol, not needless
-questioning.
+Do not ask the user for discoverable facts. The refiner may gather only its
+approved read-only intake evidence; if the question needs a broader repository
+or external search, assign a separate bounded evidence worker. The loop closes
+only when no material question remains, every assumption is explicitly
+approved, and every assigned investigation has returned a conclusion. If the
+root audit finds no user question, record that result and continue; the
+mandatory stage is the audit and interview protocol, not needless questioning.
 
 ## Coordinator evidence boundary
 

@@ -8,11 +8,11 @@ It is designed for four practical problems: context overload in the main chat, w
 
 ```mermaid
 flowchart TD
-    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Mandatory audit and ranked questions]
+    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Study spec and bounded code evidence<br/>Mandatory audit and ranked questions]
     subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
         S1 --> A1{Every material uncertainty routed?}
         A1 -->|Needs user input| Q1[Mandatory grill-me loop<br/>One decision question + recommendation] --> S1
-        A1 -->|Needs investigation| I1[Assign read-only evidence worker<br/>Requirement, repository, and/or external evidence] --> S1
+        A1 -->|Needs investigation| I1[Assign evidence worker beyond intake boundary<br/>Repository and/or external evidence] --> S1
         A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: REQ, acceptance criteria, exclusions, and audit]
         S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
         G1 -->|Needs refinement| S1
@@ -91,18 +91,23 @@ If a downstream agent discovers evidence that creates new ambiguity or expands s
 - Non-blocking questions, bugs, and ideas go to `queue.json`; they cannot silently modify the active requirement.
 - Large reasoning traces remain in artifacts. The coordinator context receives concise conclusions and paths only.
 
-## Mandatory uncertainty audit and interview
+## Mandatory research, uncertainty audit, and interview
 
-Every root requirement begins with a mandatory audit and clarification loop.
-The fresh refiner classifies each material uncertainty as resolved, an
-assumption requiring approval, needs user input, or needs investigation. The
-audit covers behavior and acceptance criteria, scope and non-goals, constraints
-and risks, and relevant integration, data, permission, or migration impact.
+Every root requirement begins with mandatory read-only research, audit, and
+clarification. The fresh refiner studies the cited specification and only the
+repository source and tests in its assigned boundary. It records concise paths,
+symbols, document sections, and findings that affect intent or constraints; it
+does not choose technical design. The refiner then classifies each material
+uncertainty as resolved, an assumption requiring approval, needs user input, or
+needs investigation. The audit covers behavior and acceptance criteria, scope
+and non-goals, constraints and risks, and relevant integration, data,
+permission, or migration impact.
 
 For each material user decision, the coordinator uses `$grill-me` to ask one
 question at a time, including a recommended answer and brief reason. After each
-answer, a fresh refiner updates the requirement audit. Do not ask for facts an
-evidence worker can discover. The loop closes only when no material user
+answer, a fresh refiner updates the requirement audit. Do not ask for facts the
+refiner can discover within its boundary; assign a separate evidence worker
+when research must go beyond it. The loop closes only when no material user
 question remains, assumptions are explicitly approved, and every bounded
 investigation has returned a conclusion; tickets and planning remain blocked
 until then.

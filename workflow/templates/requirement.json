@@ -12,6 +12,10 @@
     "status": "pending",
     "checked_areas": [],
     "material_uncertainties": [],
+    "research": {
+      "sources_checked": [],
+      "findings": []
+    },
     "interview": {
       "status": "not_started",
       "next_question": null,
