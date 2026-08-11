@@ -5,11 +5,15 @@ description: Create a repository-grounded implementation plan from an approved r
 
 # Implementation Planner
 
-Turn an approved requirement into a bounded, evidence-based plan. Treat the requirement as authoritative; codebase facts may challenge it, but may not silently reinterpret it.
+Run in a fresh worker context. Turn an approved requirement and selected ticket
+into a bounded, evidence-based plan. Treat the requirement as authoritative;
+codebase facts may challenge it, but may not silently reinterpret it.
 
 ## Inputs
 
-Read the approved `REQ-###.json`, relevant repository files, and `workflow/state/current.json`. Do not plan from chat history alone.
+Read the approved `REQ-###.json`, selected `TICKET-###.json`, relevant
+repository files, and `workflow/state/current.json`. Do not plan from chat
+history alone.
 
 ## Process
 

@@ -8,17 +8,17 @@ It is designed for four practical problems: context overload in the main chat, w
 
 ```mermaid
 flowchart TD
-    U[User request] --> S1[Step 1: Mandatory uncertainty audit<br/>Check behavior, scope, constraints, and risks]
+    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Mandatory uncertainty audit]
     subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
         S1 --> A1{Every material uncertainty routed?}
         A1 -->|Needs user input| Q1[Ask a targeted question] --> S1
         A1 -->|Needs investigation| I1[Assign read-only evidence worker<br/>Requirement, repository, and/or external evidence] --> S1
-        A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: acceptance criteria, exclusions, and audit]
+        A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: REQ, acceptance criteria, exclusions, and audit]
         S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
         G1 -->|Needs refinement| S1
-        G1 -->|Approved| S4[Step 4: Create high-level tickets<br/>Output: ordered, dependency-aware subtasks]
+        G1 -->|Approved| S4[Step 4: Fresh story-breakdown worker<br/>Output: ordered, dependency-aware tickets]
         S4 --> S5[Step 5: Select one ticket<br/>Rule: keep all other work out of active context]
-        S5 --> S6[Step 6: Plan the selected ticket<br/>Inherit root audit; delta audit only for new uncertainty<br/>Add focused code context and design graph when useful]
+        S5 --> S6[Step 6: Fresh planner worker<br/>Inherit root audit; delta audit only for new uncertainty<br/>Add focused code context and design graph when useful]
         S6 --> G2{Step 7: User approves the plan?<br/>Decision: build it this way?}
         G2 -->|Needs revision| S6
         G2 -->|Approved| S8[Step 8: Implement only the approved ticket<br/>Output: code changes and self-check evidence]
@@ -53,7 +53,12 @@ flowchart TD
     S1 -. work in progress .-> IN
 ```
 
-The numbered path is the normal flow. The lower routes show what happens when the user interrupts it: answer a harmless clarification, queue separate work, investigate an active-ticket failure, or suspend work for an urgent blocker. The coordinator alone records each state change.
+The numbered path is the normal flow. Requirement refinement, ticket breakdown,
+and planning run in fresh worker contexts; the coordinator only routes work,
+summarizes artifacts for the user, records approval, and advances state. The
+lower routes show what happens when the user interrupts it: answer a harmless
+clarification, queue separate work, investigate an active-ticket failure, or
+suspend work for an urgent blocker.
 
 ## Two-dice theory: shrink the possibility space
 
@@ -124,8 +129,8 @@ remove the need for appropriate verification.
 
 | Profile | Use it for | Required shape |
 | --- | --- | --- |
-| `light` | Small, low-risk work | One compact ticket and plan; focused verification; no plan visuals unless requested. |
-| `standard` | Normal product or code change | Requirement, tickets, selected-ticket plan, bounded implementation, independent verification; visuals when flow crosses components or is unclear. |
+| `light` | Small, low-risk work | Fresh refiner, ticket, and plan workers produce compact artifacts; focused verification; no plan visuals unless requested. |
+| `standard` | Normal product or code change | Fresh stage workers produce requirement, tickets, and selected-ticket plan; bounded implementation and independent verification; visuals when flow crosses components or is unclear. |
 | `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, extra evidence, and required plan visuals. |
 
 ## Implementation contract
@@ -162,6 +167,7 @@ unless requested. Store them in `plan_visuals` in the selected ticket plan.
 | [`AGENTS.md`](AGENTS.md) | Operating contract, state ownership, role boundaries, and approval gates. |
 | [`skills/workflow-orchestrator`](skills/workflow-orchestrator/SKILL.md) | Coordinates state, gates, delegation, recovery, and completion. |
 | [`skills/requirement-refiner`](skills/requirement-refiner/SKILL.md) | Converts vague ideas into approval-ready requirement contracts. |
+| [`skills/story-breakdown`](skills/story-breakdown/SKILL.md) | Splits an approved requirement into dependency-aware tickets. |
 | [`skills/implementation-planner`](skills/implementation-planner/SKILL.md) | Produces repository-grounded plans from approved requirements. |
 | [`skills/bounded-worker`](skills/bounded-worker/SKILL.md) | Implements an approved subtask without scope drift. |
 | [`skills/independent-verifier`](skills/independent-verifier/SKILL.md) | Independently verifies a change against requirements and plan. |
@@ -186,18 +192,30 @@ This is controlled context rehydration: the coordinator knows where information 
 ## Artifact flow
 
 1. Use `workflow/templates/requirement.json` to create `workflow/requirements/REQ-###.json`.
-2. After requirement approval, create dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
-3. Select one ticket, run a delta audit only for new material uncertainty exposed by repository inspection, and create its `workflow/plans/PLAN-###.json` artifact, including its implementation contract; obtain plan approval.
+2. After requirement approval, a fresh `story-breakdown` worker creates dependency-aware `workflow/tickets/TICKET-###.json` artifacts.
+3. Select one ticket, then a fresh planner runs a delta audit only for new material uncertainty exposed by repository inspection and creates `workflow/plans/PLAN-###.json`, including its implementation contract; obtain plan approval.
 4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
 5. Independently verify it in `workflow/reports/VER-###.json`.
 6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.
 7. Update `workflow/state/current.json` only at a state checkpoint: approval, ticket selection, investigation conclusion, verification, pause/resume, or completion.
 
-## Delegation policy
+## Fresh workers and context budget
 
-Delegate only when the work needs independent evidence, is safely independent, or would fill the coordinator context. Keep user decisions, routing, and workflow administration with the coordinator.
+The coordinator owns the conversation, user questions, queue, approvals, and
+`current.json`; it does not execute refinement, ticket breakdown, planning,
+evidence, implementation, or verification. Each of those stages starts in a
+fresh worker context with only its relevant artifacts and source boundary. The
+worker writes its artifact and returns a compact conclusion, risks, and next
+action; the coordinator then gives the user a readable summary and approval
+request rather than asking them to interpret raw JSON.
 
-The architecture does not require every role to be a separate agent on every task. The invariant is the contracts and gates, not the number of agents.
+Target coordinator context below 40% of its available window. This is an
+operating target rather than a reliable platform counter. At every approval,
+ticket selection, investigation conclusion, implementation report, and
+verification result, retain only artifact paths, approval state, unresolved
+decisions, and next action in `current.json`. Keep detailed worker output on
+disk. If the coordinator becomes noisy before a checkpoint, finish the worker
+artifact, save the state snapshot, and continue in a fresh coordinator chat.
 
 ## Evaluate the workflow
 

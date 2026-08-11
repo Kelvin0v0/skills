@@ -5,7 +5,9 @@ description: Turn vague user ideas into concise, approval-ready requirement cont
 
 # Requirement Refiner
 
-Convert user intent into a durable requirement contract. Clarify **what** the user wants; do not decide **how** the codebase should implement it.
+Run in a fresh worker context. Convert user intent into a durable requirement
+contract. Clarify **what** the user wants; do not decide **how** the codebase
+should implement it.
 
 ## Process
 
@@ -15,7 +17,7 @@ Convert user intent into a durable requirement contract. Clarify **what** the us
 4. Separate mandatory behavior, exclusions, assumptions, and unresolved decisions.
 5. Write observable acceptance criteria.
 6. Create `workflow/requirements/REQ-###.json` from `workflow/templates/requirement.json`, including the audit.
-7. Return the contract to the main agent for approval only when no material uncertainty needs user input or investigation.
+7. Return the contract, unresolved questions, and artifact path to the coordinator. Only the coordinator asks the user, records approval, or advances the workflow.
 
 ## Contract rules
 

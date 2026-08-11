@@ -58,8 +58,11 @@ Omit them for `light` work unless the developer requests them.
 
 ## Subagents
 
-Delegate in a fresh, bounded subagent context only when work needs independent
-evidence, is safely independent, or would distract the coordinator context.
+Start requirement refinement, approved-requirement ticket breakdown, and
+selected-ticket planning in fresh, bounded worker contexts. Start evidence,
+implementation, and verification work in fresh contexts too. The coordinator
+never performs those stages itself; it supplies the smallest sufficient
+artifact paths and turns worker results into a concise user-facing summary.
 
 Give a subagent only the relevant artifact paths, explicit scope, and required
 output. It returns artifact paths, concise evidence, risks or blocks, and a
@@ -67,6 +70,16 @@ recommended next action. It cannot update state, approvals, scope, or completion
 
 Keep user decisions, tiny work, routing, and all workflow-state changes with
 the coordinator.
+
+## Context budget
+
+Target the coordinator at under 40% of available context. Treat this as an
+operating target, not an exact meter: do not load full worker reports, source
+output, logs, or old conversations into the coordinator. At each gate, retain
+only artifact IDs and paths, approval state, unresolved decisions, and the
+next action in `current.json`. If context is becoming large before a gate,
+write the worker artifact and state snapshot, then resume in a fresh
+coordinator context.
 
 ## Durable state
 

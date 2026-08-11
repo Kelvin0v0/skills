@@ -11,10 +11,10 @@ The main agent is a coordinator: it advances workflow state and makes user-facin
 
 ## Operating loop
 
-1. **Audit and refine** — Use `requirement-refiner` to turn user intent into `REQ-###.json`; route material evidence needs to a read-only evidence worker.
+1. **Audit and refine** — Start a fresh `requirement-refiner` worker to turn user intent into `REQ-###.json`; route material evidence needs to a fresh read-only evidence worker.
 2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
-3. **Create tickets** — Create dependency-aware tickets from the approved requirement.
-4. **Plan one ticket** — Use `implementation-planner` to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
+3. **Create tickets** — Start a fresh `story-breakdown` worker to create dependency-aware tickets from the approved requirement.
+4. **Plan one ticket** — Start a fresh `implementation-planner` worker to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
 5. **Approve plan** — Obtain the required user decision, then update `current.json`.
 6. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
 7. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
@@ -38,7 +38,10 @@ Use this gate sequence: approved requirement -> approved plan -> implementation 
 
 ## Context isolation
 
-Use a fresh specialist context for substantial exploration, implementation, verification, or review when the current context is becoming noisy or the work benefits from independence. Use a fresh verifier context for implementation changes. Give the specialist only:
+Use a fresh specialist context for every workflow stage that creates a
+requirement, tickets, plan, evidence, implementation, verification, or review.
+Do not re-use the coordinator conversation as a worker context. Give the
+specialist only:
 
 - the active requirement and acceptance criteria;
 - the relevant paths or artifacts;
@@ -48,6 +51,17 @@ Use a fresh specialist context for substantial exploration, implementation, veri
 Require the specialist to return a concise structured handoff. Store large logs or generated artifacts on disk and return paths plus a distilled conclusion. Do not ask a reviewer to rely on the implementer's unfiltered reasoning.
 
 Delegate when a task needs evidence, is independent, bounded, or more cost-effective on a lower-capability worker. Keep only user decisions, routing, and workflow administration with the coordinator.
+
+## Context budget
+
+Target coordinator context below 40% of its available window. This is not a
+precise counter: use state checkpoints as the control. At every approval,
+ticket selection, investigation conclusion, implementation report, and
+verification result, keep only artifact paths, approval state, unresolved
+decisions, and the next action in `current.json`. Leave research, logs, code
+excerpts, and detailed reasoning in the worker artifact. If the coordinator is
+becoming noisy before a checkpoint, finish the bounded worker artifact, record
+state, and continue in a fresh coordinator context.
 
 ## Evidence assignments
 

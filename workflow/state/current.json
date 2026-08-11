@@ -10,6 +10,10 @@
   "plan_approved": false,
   "implementation_complete": false,
   "verification_status": "not_started",
+  "context_budget": {
+    "coordinator_target": "under_40_percent",
+    "last_compaction_at": null
+  },
   "suspended_by": null,
   "resume_after": null,
   "next_action": null,

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Story Breakdown"
+  short_description: "Split approved requirements into ordered tickets"
+  default_prompt: "Use $story-breakdown to create dependency-aware tickets from this approved requirement."
