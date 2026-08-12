@@ -132,14 +132,63 @@ remove the need for appropriate verification.
 | --- | --- | --- |
 | `light` | Small, low-risk work | Fresh refiner, ticket, and plan workers produce compact artifacts; focused verification; no plan visuals unless requested. |
 | `standard` | Normal product or code change | Fresh stage workers produce requirement, tickets, and selected-ticket plan; bounded implementation and independent verification; visuals when flow crosses components or is unclear. |
-| `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, extra evidence, and required plan visuals. |
+| `complex` | High uncertainty, significant risk, or multiple dependent tasks | Standard flow plus deeper discovery, dependency-aware tickets, extra evidence, required plan visuals, and the optional approved parallel-execution pack. |
+
+## Complex parallel delivery
+
+Parallel delivery is an optional `complex`-profile extension, not the default.
+Before it, the coordinator asks the developer to confirm a Git baseline. If
+the repository has none, the developer initializes version control and creates
+the baseline commit; the coordinator never does that automatically. Without a
+baseline, work stays sequential.
+
+```mermaid
+flowchart LR
+    B{"🧑 Human: confirm Git baseline"} --> T["Vertical-slice tickets"]
+    T --> P["Fresh planner per independent candidate"]
+    P --> E["Fresh execution-pack worker<br/>Compare shared contracts, files, and dependencies"]
+    E --> H{"🧑 Human: approve<br/>execution pack"}
+    H -->|Revise conflicts| P
+    H -->|Approved| W["Isolated workers in dependency-ready worktrees"]
+    W --> I["Authorized ordered integration<br/>Regression checks after every merge"]
+    I --> V["Fresh verification of integrated diff"]
+    V --> R["Manual check if required, then MR review"]
+
+    W -->|Shared discovery| E
+
+    classDef human fill:#F59E0B,color:#111827,stroke:#B45309,stroke-width:2px;
+    class B,H human;
+```
+
+Each ticket owns one user-visible outcome, acceptance-criterion references,
+non-goals, and dependencies. Planners record expected changed paths and shared
+contracts, but only the execution-pack worker compares every plan and proposes
+safe parallel batches. It does not resolve a shared API, data, UI, or design
+conflict: dependent slices pause, plans are revised, and the developer approves
+the updated pack. Individual worker verification is necessary but not enough;
+fresh verification must also inspect the integrated diff.
+
+### Planning barrier and scheduling
+
+Before the first complex-work implementer starts, every in-scope slice is
+classified as `ready`, `blocked`, or `deferred`. Every `ready` slice must have
+a plan and appear in the same execution pack; one ready plan is never
+permission to start coding. `blocked` means an evidence spike or developer
+decision is needed. `deferred` means it is explicitly outside the current pack.
+
+Each ticket records `planning_status` and `execution_wave`; each plan records
+its pack execution status. While an approved wave runs, fresh planners may plan
+later independent or deferred slices, but those slices cannot start until their
+plan is included in a newly approved execution pack. A shared discovery pauses
+only affected slices and triggers pack revision; unrelated work can continue.
 
 ## Implementation contract
 
 Every selected-ticket plan records the existing feature or generic mechanism,
 files and symbols checked, a `reuse`, `extend`, `replace`, or `create_new`
 decision, and its reason. It also records acceptance-criterion references,
-design trade-offs, expected files and symbols, boundaries, future posture, and
+one bounded implementation mission, observable acceptance checks, design
+trade-offs, expected files and symbols, boundaries, future posture, and
 required checks. This is part of normal plan approval, not a separate gate.
 
 Use a read-only investigation only when the planner cannot establish the
@@ -148,6 +197,19 @@ evidence supports it; otherwise set `no_future_generalisation`. Workers choose
 ordinary local names and private helpers, but return to planning for a material
 change to behavior, reuse/design, API/data/permissions/migration, scope, risk,
 or boundaries. Independent verification checks the whole contract.
+
+The implementer follows this delivery cycle for the approved mission:
+
+```text
+mission -> acceptance checks -> RED -> implement -> GREEN -> refactor
+        -> whole-mission self-check -> independent verification
+```
+
+Use `RED -> GREEN -> refactor` only when an automated test is useful. For a
+visual-only, configuration, migration, or similarly non-testable change, the
+plan records the strongest focused alternative check. The whole-mission
+self-check is still worker evidence; the fresh verifier decides whether the
+requirement and plan actually pass.
 
 ## Plan visuals
 
@@ -192,6 +254,7 @@ approved visual and interaction contract as well as functional behavior.
 | [`skills/requirement-refiner`](skills/requirement-refiner/SKILL.md) | Converts vague ideas into approval-ready requirement contracts. |
 | [`skills/story-breakdown`](skills/story-breakdown/SKILL.md) | Splits an approved requirement into dependency-aware tickets. |
 | [`skills/implementation-planner`](skills/implementation-planner/SKILL.md) | Produces repository-grounded plans from approved requirements. |
+| [`skills/parallel-execution-pack`](skills/parallel-execution-pack/SKILL.md) | Compares complex-ticket plans and prepares an approval-ready parallel execution pack. |
 | [`skills/bounded-worker`](skills/bounded-worker/SKILL.md) | Implements an approved subtask without scope drift. |
 | [`skills/independent-verifier`](skills/independent-verifier/SKILL.md) | Independently verifies a change against requirements and plan. |
 | [`skills/failure-investigator`](skills/failure-investigator/SKILL.md) | Gathers bounded evidence for failures or material uncertainty and recommends routing. |
@@ -220,7 +283,8 @@ This is controlled context rehydration: the coordinator knows where information 
 4. Assign that approved ticket to a worker and capture its result as `workflow/reports/IMP-###.json`.
 5. Independently verify it in `workflow/reports/VER-###.json`.
 6. If verification fails, record `workflow/reports/INV-###.json`, then repair or return to requirement approval before fresh verification.
-7. Update `workflow/state/current.json` only at a state checkpoint: approval, ticket selection, investigation conclusion, verification, pause/resume, or completion.
+7. For approved complex parallel work, create `workflow/execution-packs/EXEC-###.json`, dispatch only safe dependency-ready slices, and verify the integrated diff after ordered integration.
+8. Update `workflow/state/current.json` only at a state checkpoint: approval, ticket selection, investigation conclusion, verification, Git-baseline confirmation, execution-pack approval, pause/resume, or completion.
 
 ## Fresh workers and context budget
 

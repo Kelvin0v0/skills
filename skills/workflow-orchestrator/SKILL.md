@@ -13,15 +13,30 @@ The main agent is a coordinator: it advances workflow state and makes user-facin
 
 1. **Research, audit, and interview** — Start a fresh, read-only `requirement-refiner` worker with a cited-specification, repository-source, and test boundary to turn user intent into `REQ-###.json`. Route research beyond that boundary to a fresh evidence worker. For each material user decision, use `$requirement-interview` in the coordinator chat: ask one question with a recommendation, wait, record the answer, then re-run the fresh refiner. Do not start tickets until this loop closes.
 2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
-3. **Create tickets** — Start a fresh `story-breakdown` worker to create dependency-aware tickets from the approved requirement.
-4. **Plan one ticket** — Start a fresh `implementation-planner` worker to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
-5. **Approve plan** — Obtain the required user decision, then update `current.json`.
-6. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
-7. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
-8. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
-9. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
+3. **Confirm version-control baseline** — Before code-changing planning, ask the developer to confirm a Git baseline. If one does not exist, ask the developer to initialize and commit it; never do this automatically. Without confirmation, do not use worktrees or parallel delivery.
+4. **Create tickets** — Start a fresh `story-breakdown` worker to create dependency-aware tickets from the approved requirement.
+5. **Plan one ticket** — Start a fresh `implementation-planner` worker to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
+6. **Approve plan** — Obtain the required user decision, then update `current.json`.
+7. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
+8. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
+9. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
+10. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
 
 For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Say which gates were compressed in the final handoff. Never bypass requirement and plan approval for an implementation change.
+
+For `complex` work, classify every in-scope slice as `ready`, `blocked`, or
+`deferred` before implementation. Plan every ready slice, then start a fresh
+`parallel-execution-pack` worker. It writes
+`workflow/execution-packs/EXEC-###.json` with the full slice schedule,
+conflicts, safe batches, integration order, and checks. One ready plan is never
+permission to implement: the coordinator presents the complete pack for
+developer approval before dispatching any worktree. A blocked slice needs
+evidence or a developer decision; a deferred slice is outside the current pack.
+The worker cannot resolve technical conflicts itself. Later independent slices
+may be planned while an approved wave runs, but require a newly approved pack
+before they start. Integrate only verified worktrees in approved order, run
+regression checks after each merge, then use fresh verification on the
+integrated diff.
 
 ## Gate protocol
 

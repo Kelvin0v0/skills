@@ -9,7 +9,7 @@ Verify outcomes from fresh evidence. Treat the worker's report as a lead, not pr
 
 ## Required inputs
 
-Read the approved requirement, approved plan, implementation report, actual diff, relevant code, and existing tests. Use a fresh context whenever practical.
+Read the approved requirement, approved plan, implementation report, actual diff, relevant code, and existing tests. For an execution pack, also read the approved pack, integrated diff, and every referenced implementation report. Use a fresh context whenever practical.
 
 ## Process
 

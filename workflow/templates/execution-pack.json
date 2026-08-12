@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "id": "EXEC-###",
+  "requirement_id": "REQ-###",
+  "delivery_profile": "complex",
+  "version_control_baseline_ref": "",
+  "ticket_plan_ids": [],
+  "slice_schedule": [
+    {
+      "ticket_id": "",
+      "plan_id": "",
+      "status": "ready",
+      "execution_wave": null,
+      "reason": ""
+    }
+  ],
+  "parallel_batches": [],
+  "integration_order": [],
+  "shared_contracts": [],
+  "conflicts_or_decisions": [],
+  "required_regression_checks": [],
+  "manual_check_required": false,
+  "mr_review_required": true,
+  "approved": false,
+  "approved_by": null,
+  "approved_at": null
+}

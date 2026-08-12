@@ -4,6 +4,12 @@
   "requirement_id": "REQ-###",
   "summary": "",
   "acceptance_criteria_ids": [],
+  "owned_outcomes": [],
+  "non_goals": [],
   "blocked_by": [],
+  "shared_contracts": [],
+  "parallel_candidate": false,
+  "planning_status": "not_started",
+  "execution_wave": null,
   "status": "ready"
 }

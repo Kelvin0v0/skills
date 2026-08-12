@@ -12,6 +12,12 @@
   },
   "implementation_contract": {
     "acceptance_criteria_ids": [],
+    "implementation_mission": {
+      "summary": "",
+      "acceptance_checks": [],
+      "red_green_refactor": "when_practical",
+      "non_tdd_check_reason": ""
+    },
     "design_tradeoffs": [],
     "expected_files_and_symbols": [],
     "boundaries": {
@@ -51,6 +57,16 @@
       "migration_rollback_permissions": [],
       "indexes_and_performance": []
     }
+  },
+  "parallel_safety": {
+    "candidate": false,
+    "execution_status": "not_in_pack",
+    "execution_wave": null,
+    "expected_changed_paths": [],
+    "shared_files_or_symbols": [],
+    "shared_contracts": [],
+    "depends_on_ticket_ids": [],
+    "risks": []
   },
   "plan_visuals": {
     "status": "not_needed",

@@ -15,10 +15,11 @@ template. Do not read chat history or inspect product source.
 
 ## Process
 
-1. Split only the approved acceptance criteria and explicitly recorded dependencies.
+1. Split only the approved acceptance criteria and explicitly recorded dependencies into small, independently useful vertical slices.
 2. Create `workflow/tickets/TICKET-###.json` from the ticket template.
-3. Give every ticket a concise outcome, acceptance-criterion references, dependencies, and blockers.
-4. Keep tickets small enough for one fresh planner and one bounded implementation worker.
+3. Give every ticket a concise owned outcome, acceptance-criterion references, non-goals, dependencies/blockers, and known shared contracts.
+4. Mark a ticket as a parallel candidate only when the approved requirement shows no dependency; set `planning_status` to `not_started`. Source-level safety remains for a later fresh planner and execution-pack worker to assess.
+5. Keep tickets small enough for one fresh planner and one bounded implementation worker.
 5. Return ticket paths, suggested order, risks, and one next action to the coordinator.
 
 ## Boundaries

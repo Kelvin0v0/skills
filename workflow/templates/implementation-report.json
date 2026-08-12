@@ -11,6 +11,11 @@
   "implementation_contract_followed": null,
   "changed_files": [],
   "tests_run": [],
+  "mission_self_check": {
+    "status": "pending",
+    "acceptance_checks_completed": [],
+    "non_tdd_checks": []
+  },
   "evidence": [],
   "scope_change": false,
   "blocked_by": [],

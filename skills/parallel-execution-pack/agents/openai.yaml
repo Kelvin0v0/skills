@@ -1,0 +1,4 @@
+interface:
+  display_name: "Parallel Execution Pack"
+  short_description: "Prepare safe parallel delivery"
+  default_prompt: "Use $parallel-execution-pack to prepare a complex parallel delivery pack from approved ticket plans."

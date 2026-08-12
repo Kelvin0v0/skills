@@ -70,12 +70,29 @@ At requirement approval, the coordinator sets `delivery_profile` to `light`,
 or risk changes. Profiles control artifact detail and delegation, not authority
 or the need for appropriate verification.
 
+## Version-control baseline
+
+Before planning or implementing a code-changing requirement, the coordinator
+asks the developer to confirm a Git baseline. If the repository is not under
+version control, ask the developer to initialize it and create a baseline
+commit; do not initialize or commit on the developer's behalf. Record the
+baseline reference at the gate. If the developer declines, continue only with
+explicitly approved sequential work: worktrees, parallel implementation, and
+integration packs are unavailable.
+
 ## Implementation boundary
 
 An approved ticket plan defines its material behavior, reuse/design decision,
 boundaries, and checks. Workers may choose normal local names and private
 helpers. Return to planning only when implementation would materially change
 behavior, reuse/design, API/data/permissions/migration, scope, risk, or boundaries.
+
+The planner gives each implementation worker one bounded mission and observable
+acceptance checks. The worker follows `mission -> acceptance checks -> RED ->
+implement -> GREEN -> refactor -> whole-mission self-check` where automated
+tests are practical. For visual-only, configuration, migration, or other work
+without a useful RED test, use the strongest suitable focused check instead.
+The self-check is evidence only; fresh independent verification remains required.
 
 Plan visuals are part of that plan, not another gate: require focused code
 context and a small design graph for `complex` work; use them for `standard`
@@ -106,6 +123,41 @@ recommended next action. It cannot update state, approvals, scope, or completion
 Keep user decisions, tiny work, routing, and all workflow-state changes with
 the coordinator.
 
+## Complex parallel delivery
+
+Use parallel delivery only for `complex` work with independently useful vertical
+slices and a confirmed Git baseline. A fresh planner produces one plan per
+candidate slice. A fresh `parallel-execution-pack` worker compares those plans,
+identifies shared files, API/data/UI contracts, dependencies, risks, safe
+parallel batches, integration order, and required regression/manual checks. It
+does not resolve technical conflicts; it returns them to the coordinator for a
+developer decision or re-planning.
+
+Before dispatching the first complex-work implementation worker, classify every
+in-scope slice as `ready`, `blocked`, or `deferred`. Plan every `ready` slice,
+then put all of their plans in one execution pack. A ready slice is not
+permission to implement by itself: the developer must approve the complete pack
+first. A blocked slice needs an evidence spike or developer decision; a deferred
+slice is explicitly outside the current pack.
+
+The coordinator presents the compact execution pack and dependency graph for
+developer approval before any parallel implementation. Each approved,
+dependency-ready slice may run in its own isolated worktree. A discovery stays
+within its slice; if it changes a shared contract, scope, or design decision,
+pause affected dependent slices, investigate, revise the pack or plans, and
+obtain approval again.
+
+While an approved execution wave runs, independent later or deferred slices may
+be planned in fresh contexts. They must not implement until their plan appears
+in a newly approved execution pack. Pause planning only for a discovery or
+shared decision that materially affects that slice.
+
+After an authorized integration runner merges only verified worktrees in the
+approved dependency order, run the pack's regression checks after each merge.
+Run fresh verification against the integrated diff, not merely each worktree.
+Present a combined change and verification summary for any manual check in the
+pack, then run the repository's MR review process when one is available.
+
 ## Worker result and user view
 
 Every worker returns at most five items: status, one-sentence summary, exact
@@ -128,8 +180,9 @@ coordinator context.
 
 `current.json` is the small active-work snapshot, not a chat cache. Update it
 only at approvals, ticket selection, investigation conclusions, verification,
-pause/resume, and completion. Detailed requirements, tickets, plans, reports,
-and queued interruptions live in their linked artifacts.
+pause/resume, completion, Git-baseline confirmation, and execution-pack
+approval. Detailed requirements, tickets, plans, reports, execution packs, and
+queued interruptions live in their linked artifacts.
 
 ## New user input
 
