@@ -31,6 +31,27 @@
       "scope_risk_or_boundaries"
     ]
   },
+  "design_lanes": {
+    "applicable": [],
+    "ui_ux": {
+      "components_and_layout": [],
+      "states_and_accessibility": []
+    },
+    "frontend": {
+      "data_rendering_and_formatting": [],
+      "interactions_and_client_state": [],
+      "api_contracts": []
+    },
+    "backend": {
+      "entry_points_and_service_flow": [],
+      "validation_and_authorization": []
+    },
+    "data_sql": {
+      "schema_and_query_behavior": [],
+      "migration_rollback_permissions": [],
+      "indexes_and_performance": []
+    }
+  },
   "plan_visuals": {
     "status": "not_needed",
     "reason": "",

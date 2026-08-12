@@ -46,6 +46,13 @@ approved, and every assigned investigation has returned a conclusion. If the
 root audit finds no user question, record that result and continue; the
 mandatory stage is the audit and interview protocol, not needless questioning.
 
+When a screenshot, mock-up, or design image is supplied, treat it as evidence
+of visible appearance, not a complete behavior specification. The refiner
+records observable layout and states, asks the developer about material hidden
+behavior, and identifies any feature that is impractical to reproduce exactly.
+It presents feasible alternatives and their trade-offs before requirement
+approval; it never guesses an interaction from pixels alone.
+
 ## Coordinator evidence boundary
 
 The coordinator may read user input and workflow artifacts only. It must not
@@ -74,6 +81,15 @@ Plan visuals are part of that plan, not another gate: require focused code
 context and a small design graph for `complex` work; use them for `standard`
 work when a change crosses components or the flow would otherwise be unclear.
 Omit them for `light` work unless the developer requests them.
+
+For work with user interfaces, the requirement records the UI/UX contract:
+reference images, visible layout, material interactions, states, accessibility,
+and visual acceptance checks. The selected-ticket planner translates only the
+applicable contract into one plan across UI/UX, frontend, backend, and data/SQL
+lanes. It may discuss implementation alternatives in its visible worker chat,
+but any answer that materially changes behavior, scope, permissions, data, or
+architecture returns to the coordinator and requirement gate. Do not create a
+separate mandatory worker for every lane; split only independent complex work.
 
 ## Subagents
 

@@ -15,9 +15,10 @@ Read the approved requirement, approved plan, implementation report, actual diff
 
 1. Map every acceptance criterion to evidence, a test, or an explicit failure.
 2. Run focused checks and relevant broader checks in proportion to risk.
-3. Inspect the diff for scope expansion, regressions, unverified claims, and whether the plan's reuse decision and implementation contract were followed without unnecessary duplication.
-4. Write `workflow/reports/VER-###.json` from `workflow/templates/verification-report.json`.
-5. Return: `pass` or `fail`, one-sentence result, exact
+3. For applicable UI/UX work, verify the approved visible layout, required interaction behavior, states, and accessibility criteria. Compare supplied references only against the approved UI/UX contract; do not fail implementation for hidden behavior that was never approved.
+4. Inspect the diff for scope expansion, regressions, unverified claims, and whether the plan's reuse decision and implementation contract were followed without unnecessary duplication.
+5. Write `workflow/reports/VER-###.json` from `workflow/templates/verification-report.json`.
+6. Return: `pass` or `fail`, one-sentence result, exact
 `workflow/reports/VER-###.json` path, blocking failure or `none`, and one
 recommended next action. Keep detailed evidence in the report.
 

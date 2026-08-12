@@ -6,6 +6,15 @@
   "must": [],
   "must_not": [],
   "acceptance_criteria": [],
+  "ui_ux": {
+    "reference_images": [],
+    "visible_layout_and_style": [],
+    "material_interactions": [],
+    "states": [],
+    "accessibility_criteria": [],
+    "visual_acceptance_checks": [],
+    "feasibility_alternatives": []
+  },
   "assumptions": [],
   "unresolved": [],
   "clarification_audit": {

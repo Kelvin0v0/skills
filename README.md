@@ -2,64 +2,51 @@
 
 This repository is a Git-versioned starter kit for a progressive-constraint workflow: the coordinator owns state and decisions, while disposable specialists produce bounded evidence in clean contexts.
 
-It is designed for four practical problems: context overload in the main chat, workflow drift from side conversations, unnecessary use of expensive agents for bounded work, and coding from unrefined abstract ideas.
+It addresses four common weaknesses in long-running Codex and agentic-AI work:
+
+1. **Coordinator context overload:** large source output, research, and old discussion crowd out the active decision.
+2. **Conversation-order drift:** side questions and bugs can accidentally change work already in progress.
+3. **Premature implementation:** an agent can start coding before the user intent, boundaries, and acceptance criteria are stable.
+4. **Lost or unbounded specialist work:** investigation and planning can consume context, repeat work, or disappear without a durable conclusion.
+
+The workflow keeps the coordinator small and decision-focused, persists approved
+artifacts, delegates bounded work to fresh contexts, and makes material human
+approval explicit.
 
 ## Workflow graph
 
 ```mermaid
-flowchart TD
-    U[User request] --> S1[Step 1: Fresh requirement-refiner worker<br/>Study spec and bounded code evidence<br/>Mandatory audit and ranked questions]
-    subgraph normal_flow[Normal workflow: reduce uncertainty before code changes]
-        S1 --> A1{Every material uncertainty routed?}
-        A1 -->|Needs user input| Q1[Mandatory requirement-interview loop<br/>One decision question + recommendation] --> S1
-        A1 -->|Needs investigation| I1[Assign evidence worker beyond intake boundary<br/>Repository and/or external evidence] --> S1
-        A1 -->|Resolved or assumption recorded| S2[Step 2: Save the detailed requirement<br/>Output: REQ, acceptance criteria, exclusions, and audit]
-        S2 --> G1{Step 3: User approves the requirement?<br/>Decision: build the right thing?}
-        G1 -->|Needs refinement| S1
-        G1 -->|Approved| S4[Step 4: Fresh story-breakdown worker<br/>Output: ordered, dependency-aware tickets]
-        S4 --> S5[Step 5: Select one ticket<br/>Rule: keep all other work out of active context]
-        S5 --> S6[Step 6: Fresh planner worker<br/>Inherit root audit; delta audit only for new uncertainty<br/>Add focused code context and design graph when useful]
-        S6 --> G2{Step 7: User approves the plan?<br/>Decision: build it this way?}
-        G2 -->|Needs revision| S6
-        G2 -->|Approved| S8[Step 8: Implement only the approved ticket<br/>Output: code changes and self-check evidence]
-        S8 --> S9[Step 9: Verify in a fresh context<br/>Output: independent evidence against acceptance criteria]
-        S9 --> G3{Acceptance criteria pass?}
-        G3 -->|Yes| S10[Step 10: Record completion<br/>Output: verified result and next ticket]
-    end
+flowchart LR
+    U["User request"] --> R["1. Fresh refiner<br/>Spec, screenshots, and evidence"]
+    R --> Q{"Material question<br/>or feasible alternative?"}
+    Q -->|Yes| H1{"🧑 Human: answer one<br/>decision question"}
+    H1 --> R
+    Q -->|No| H2{"🧑 Human: approve<br/>requirement"}
+    H2 -->|Refine| R
+    H2 -->|Approved| T["2. Fresh ticket worker<br/>Create and select one ticket"]
+    T --> P["3. Fresh planner<br/>Applicable UI / frontend / backend / data"]
+    P --> H3{"🧑 Human: approve plan<br/>or request revision"}
+    H3 -->|Revise| P
+    H3 -->|Approved| I["4. Fresh implementer"]
+    I --> V["5. Fresh independent verifier"]
+    V --> C{"Acceptance criteria pass?"}
+    C -->|Yes| D["Complete / select next ticket"]
+    C -->|No| F["Investigate failure"]
+    F --> R
 
-    ST[(current.json: active work and approvals)]
-    G1 -. coordinator records decision .-> ST
-    G2 -. coordinator records decision .-> ST
-    S10 -. coordinator records completion .-> ST
+    N["New user input"] -.-> X{"Coordinator classifies"}
+    X -->|Unrelated| K["Queue separately"]
+    X -->|Changes active work| R
+    X -->|Active failure| F
 
-    IN[New user input during any active step] --> C{Classify: does it change active work?}
-    C -->|Clarification only| A[Answer without changing scope] --> R[Resume the same active step]
-    C -->|New requirement or enhancement| Q[Queue it separately<br/>It cannot alter the active ticket]
-    Q --> L[When chosen later: start Step 1 audit]
-    L --> S1
-    C -->|Unrelated bug| QB[Queue it as separate work]
-    QB --> BT[When chosen later: start Step 1 audit for its own work]
-    BT --> S1
-    C -->|Bug fails active acceptance criteria| I[Assign evidence worker to investigate or reproduce<br/>Output: evidence and likely cause]
-    I --> P{Does the approved plan already cover repair?}
-    P -->|Yes| S8
-    P -->|No: scope changed| S1
-    C -->|Safety, data-loss, or production blocker| X[Suspend active work<br/>Handle the urgent risk first]
-    X -. coordinator records suspension .-> ST
-    X --> D{Recovery decision}
-    D -->|Resume| R
-    D -->|Scope changed| S1
-
-    S1 -. work in progress .-> IN
+    classDef human fill:#F59E0B,color:#111827,stroke:#B45309,stroke-width:2px;
+    class H1,H2,H3 human;
 ```
 
-The numbered path is the normal flow. Requirement refinement, ticket breakdown,
-and planning run in fresh worker contexts. The coordinator runs the mandatory
-one-question-at-a-time `$requirement-interview` loop for material user decisions, summarizes
-artifacts, records approval, and advances state. The lower routes show what
-happens when the user interrupts it: answer a harmless clarification, queue
-separate work, investigate an active-ticket failure, or suspend work for an
-urgent blocker.
+Orange boxes are the deliberate human interaction points: answer a material
+requirement question, approve the requirement, and approve the selected-ticket
+plan. All other boxes are coordinator routing or bounded fresh-worker stages.
+New unrelated work is queued; it never silently changes the active ticket.
 
 ## Two-dice theory: shrink the possibility space
 
@@ -173,6 +160,27 @@ use a graph for a one-file local edit, or present speculative final code.
 `complex` plans require both visuals. `standard` plans include them when the
 change crosses components or the flow is unclear. `light` plans omit them
 unless requested. Store them in `plan_visuals` in the selected ticket plan.
+
+## Screenshots and design work
+
+A screenshot is evidence of what is visible, not evidence of everything the
+software must do. In Step 1, the fresh requirement refiner records the visible
+layout, styling, states, and visual acceptance checks in the requirement. It
+then asks the developer only about material behavior that images cannot show:
+interactions, loading/error/empty states, accessibility, data rules, and device
+support. If an exact visual detail would be impractical or fragile, it records
+a feasible alternative and its user-visible trade-off for approval.
+
+After approval, the fresh selected-ticket planner turns that UI/UX contract
+into one implementation plan. It uses only the lanes that apply: `ui_ux` for
+components, layout, states, and accessibility; `frontend` for rendering,
+formatting, interactions, client state, and API contracts; `backend` for entry
+points, validation, and service flow; and `data_sql` for schema, queries,
+migration/rollback, permissions, and material performance choices. The planner
+may discuss alternatives with the developer in its fresh chat, but a decision
+that changes the approved behavior, scope, permissions, data, or architecture
+returns to the coordinator and requirement gate. Verification checks the
+approved visual and interaction contract as well as functional behavior.
 
 ## Repository contents
 
