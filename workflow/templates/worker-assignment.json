@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "id": "ASSIGN-###",
+  "role": "",
+  "goal": "",
+  "allowed_sources": [
+    {
+      "path": "",
+      "purpose": ""
+    }
+  ],
+  "required_artifact_path": "",
+  "input_budget": {
+    "max_named_sources": 5,
+    "max_narrow_path_patterns": 1,
+    "max_screenshots": 1,
+    "allow_raw_conversation": false
+  },
+  "budget": {
+    "max_report_words": 250,
+    "max_findings": 6,
+    "max_questions": 1
+  },
+  "stop_condition": "",
+  "status": "pending"
+}

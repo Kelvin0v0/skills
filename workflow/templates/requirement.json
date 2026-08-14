@@ -2,6 +2,7 @@
   "schema_version": "1.0",
   "id": "REQ-###",
   "spec_path": "",
+  "source_references": [],
   "goal": "",
   "must": [],
   "must_not": [],

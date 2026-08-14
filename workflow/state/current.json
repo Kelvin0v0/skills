@@ -12,6 +12,12 @@
   "execution_pack_approved": false,
   "implementation_complete": false,
   "verification_status": "not_started",
+  "intake": {
+    "status": "not_assessed",
+    "recommended_route": null,
+    "developer_choice": null,
+    "reason": null
+  },
   "context_budget": {
     "coordinator_target": "under_40_percent",
     "last_compaction_at": null

@@ -1,131 +1,73 @@
 ---
 name: workflow-orchestrator
-description: Coordinate multi-stage work with explicit gates, durable state, context-isolated specialists, structured handoffs, and interruption handling. Use when a request spans discovery, specification, planning, implementation, verification, review, or other stages where conversation order and context growth could cause drift.
+description: Coordinate multi-stage work with a developer-selected intake route, durable state, fresh bounded specialists, approval gates, and interruption handling. Use when a request may need investigation, planning, implementation, verification, or complex parallel delivery.
 ---
 
 # Workflow Orchestrator
 
-Use this skill to keep an active requirement stable while work moves through small, verifiable stages. Treat the project `AGENTS.md` as the operating contract and `workflow/state/current.json` as the authoritative snapshot.
+Use the project `AGENTS.md` as the operating contract and
+`workflow/state/current.json` as the active snapshot. The coordinator routes,
+asks users, and updates state; it does not investigate source, run tests,
+browse, or make technical design decisions.
 
-The main agent is a coordinator: it advances workflow state and makes user-facing decisions, but does not investigate source code, run tests, reproduce defects, browse external sources, or make technical design decisions. Specialists create evidence artifacts and recommendations; they never approve scope, modify `current.json`, or declare completion.
+## Step 0: intake route
 
-## Operating loop
+Before creating a worker for a root code-changing request, recommend one route:
 
-1. **Research, audit, and interview** — Start a fresh, read-only `requirement-refiner` worker with a cited-specification, repository-source, and test boundary to turn user intent into `REQ-###.json`. Route research beyond that boundary to a fresh evidence worker. For each material user decision, use `$requirement-interview` in the coordinator chat: ask one question with a recommendation, wait, record the answer, then re-run the fresh refiner. Do not start tickets until this loop closes.
-2. **Approve requirement** — Obtain the required user decision, then update `current.json`.
-3. **Confirm version-control baseline** — Before code-changing planning, ask the developer to confirm a Git baseline. If one does not exist, ask the developer to initialize and commit it; never do this automatically. Without confirmation, do not use worktrees or parallel delivery.
-4. **Create tickets** — Start a fresh `story-breakdown` worker to create dependency-aware tickets from the approved requirement.
-5. **Plan one ticket** — Start a fresh `implementation-planner` worker to inspect the repository and write `PLAN-###.json` for the selected ticket, including focused code context and a Mermaid design graph when the delivery profile requires them.
-6. **Approve plan** — Obtain the required user decision, then update `current.json`.
-7. **Implement** — Use `bounded-worker` for approved, bounded tasks; retain only the report and artifact paths in the main context.
-8. **Verify** — Use `independent-verifier` in a fresh context for implementation changes.
-9. **Investigate failures** — Use `failure-investigator` to route a verification failure to a worker or back to refinement.
-10. **Review and complete** — Validate evidence, update `current.json`, and report completion or residual risk.
+```text
+answer | investigate | light fix | full plan | queue
+```
 
-For a small, low-risk request, compress stages only when the omitted gate cannot change scope or correctness. Say which gates were compressed in the final handoff. Never bypass requirement and plan approval for an implementation change.
+Include a one-sentence reason, material risk, and expected worker count. Wait
+for the developer's choice unless it is already explicit. Record the choice in
+`current.json` and do not silently turn `fix now` into full planning.
 
-For `complex` work, classify every in-scope slice as `ready`, `blocked`, or
-`deferred` before implementation. Plan every ready slice, then start a fresh
-`parallel-execution-pack` worker. It writes
-`workflow/execution-packs/EXEC-###.json` with the full slice schedule,
-conflicts, safe batches, integration order, and checks. One ready plan is never
-permission to implement: the coordinator presents the complete pack for
-developer approval before dispatching any worktree. A blocked slice needs
-evidence or a developer decision; a deferred slice is outside the current pack.
-The worker cannot resolve technical conflicts itself. Later independent slices
-may be planned while an approved wave runs, but require a newly approved pack
-before they start. Integrate only verified worktrees in approved order, run
-regression checks after each merge, then use fresh verification on the
-integrated diff.
+- **Answer**: no code change or worker.
+- **Queue**: use `interruption-queue`; resume active work unchanged.
+- **Investigate**: create one read-only evidence assignment, then return here.
+- **Light fix**: one fresh fast-audit/micro-plan worker. It may implement only
+  within the light-route conditions in `AGENTS.md`; otherwise return `blocked`
+  with a full-plan recommendation.
+- **Full plan**: use the operating loop.
 
-## Gate protocol
+## Full-plan operating loop
 
-Before advancing a stage, record:
+1. Fresh `requirement-refiner`: audit intent and bounded evidence; use
+   `$requirement-interview` for one material decision at a time.
+2. Obtain requirement approval and confirm the Git baseline.
+3. Fresh `story-breakdown`: create dependency-aware tickets; select one.
+4. Fresh `implementation-planner`: write the selected ticket plan.
+5. Obtain plan approval.
+6. Fresh `bounded-worker`: implement the approved mission.
+7. Fresh `independent-verifier`: verify against the requirement, plan, and diff.
+8. On failure, use `failure-investigator`; rework only when the route is clear.
 
-- the stage that just finished;
-- the evidence or artifact it produced;
-- unresolved decisions and who must decide them;
-- the next stage and its first concrete action.
+For `complex` work, plan every ready slice, use one fresh
+`parallel-execution-pack` worker, and obtain execution-pack approval before any
+isolated implementation worker starts. Integrate verified work in approved
+order and independently verify the integrated diff.
 
-Stop and ask for direction when an unresolved decision would materially change behavior, scope, external impact, or data safety. Do not use a later implementation decision to silently resolve an earlier requirement ambiguity.
+## Assignment and handoff
 
-For a root requirement, ask questions one at a time through `$requirement-interview`; do not
-send a questionnaire. Ask only decisions that evidence workers cannot discover.
-After every answer, re-run the requirement refiner so the persisted audit, not
-the coordinator's memory, determines whether the next question is needed.
+Create or describe `workflow/templates/worker-assignment.json` for every fresh
+worker. Name one goal, no more than the budgeted named sources, a required
+artifact, a report limit, and a stop condition. Pass source paths and purposes,
+not transcripts, logs, broad scans, or repeated screenshots. Use the smallest
+budget that can answer the decision.
 
-Use this gate sequence: approved requirement -> approved plan -> implementation report -> independent verification report -> completion. If a stage expands the possibility space, route it back to the main gate instead of improvising.
+Workers return five items only: status, one-sentence summary, exact artifact
+path, open block, and next action. Keep detailed reasoning in the artifact and
+show the user a plain-language summary with its path. Use `stage-handoff` only
+when a new context needs durable stage evidence, not for every short message.
 
-## Context isolation
+At each gate, retain only route, IDs, paths, approvals, unresolved decisions,
+and next action in `current.json`. If the coordinator becomes noisy, save the
+worker artifact and resume from that snapshot in a fresh coordinator context.
 
-Use a fresh specialist context for every workflow stage that creates a
-requirement, tickets, plan, evidence, implementation, verification, or review.
-Do not re-use the coordinator conversation as a worker context. Give the
-specialist only:
+## Interruption and recovery
 
-- the active requirement and acceptance criteria;
-- the relevant paths or artifacts;
-- constraints and known risks;
-- the requested output and validation boundary.
-
-Require the specialist to return five items: status, one-sentence summary,
-exact artifact path, open decision or block, and one next action. Store large
-logs or generated artifacts on disk. The coordinator presents that result to
-the user with a clickable artifact link and the exact path, rather than raw
-JSON or a request to search for the file. Do not ask a reviewer to rely on the
-implementer's unfiltered reasoning.
-
-Delegate when a task needs evidence, is independent, bounded, or more cost-effective on a lower-capability worker. Keep only user decisions, routing, and workflow administration with the coordinator.
-
-## Context budget
-
-Target coordinator context below 40% of its available window. This is not a
-precise counter: use state checkpoints as the control. At every approval,
-ticket selection, investigation conclusion, implementation report, and
-verification result, keep only artifact paths, approval state, unresolved
-decisions, and the next action in `current.json`. Leave research, logs, code
-excerpts, and detailed reasoning in the worker artifact. If the coordinator is
-becoming noisy before a checkpoint, finish the bounded worker artifact, record
-state, and continue in a fresh coordinator context.
-
-## Evidence assignments
-
-For a material unknown, the coordinator creates a bounded, read-only evidence assignment instead of investigating itself. Record it in `INV-###.json` with:
-
-- the exact question and evidence level: `requirement`, `repository`, `external`, or a combination;
-- allowed sources and a stop condition;
-- evidence and a conclusion about the active requirement or ticket;
-- a recommended route: continue, ask the user, refine the requirement, re-plan, or remain blocked.
-
-Gather evidence in this order: approved artifacts, repository source and tests, then official external documentation. If the assignment cannot resolve the question within scope, return a precise user question or blocked report; do not continue researching indefinitely.
-
-## Interruption routing
-
-When a user raises a question, bug, or idea during active work, classify it before changing the current plan:
-
-- **Blocker** — handle now if the active work cannot safely continue.
-- **Safety/data risk** — pause the affected action and resolve now.
-- **Non-blocking** — append it to `workflow/state/queue.json` and continue.
-- **Requirement-impacting** — pause, re-enter intake/specification, and update the active requirement explicitly.
-
-Use the `interruption-queue` skill for the queue record and the `stage-handoff` skill for cross-stage artifacts.
-
-## Recovery
-
-If a specialist fails, returns an incomplete artifact, or disagrees with the active requirement:
-
-1. Preserve the failed output for diagnosis when it is useful.
-2. Mark the handoff as incomplete and state the missing evidence.
-3. Re-run only the missing stage or route the issue to the coordinator.
-4. Do not advance based on an ambiguous or stale handoff.
-
-If verification fails, do not immediately re-run implementation. First create a verification report and use `failure-investigator` when the cause is unclear. Route implementation defects to a bounded worker; route requirement or scope conflicts to the main gate and requirement refinement.
-
-## Completion checklist
-
-- Acceptance criteria are satisfied or explicitly marked incomplete.
-- Relevant checks have run and their results are recorded.
-- The diff contains no unexplained scope expansion.
-- Durable decisions and follow-ups have been stored.
-- Non-blocking interruptions remain in the queue.
-- The final response distinguishes completed work, verification, risks, and next actions.
+Classify new input before changing active work: answer a clarification, queue
+unrelated work, investigate an active failure, or suspend for a safety/data
+risk. A queued item never changes an approved requirement silently. Do not
+advance from incomplete, stale, or contradictory evidence; return `blocked` and
+route only the missing decision or investigation.

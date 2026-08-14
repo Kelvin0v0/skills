@@ -1,65 +1,23 @@
 ---
 name: stage-handoff
-description: Create and consume concise, traceable handoff artifacts between workflow stages or specialist agents. Use when the receiving context must continue from durable state without rereading the entire conversation or trusting unstructured summaries.
+description: Create or consume a concise, traceable JSON contract between workflow stages or fresh specialists. Use when the receiving context needs durable evidence rather than chat history.
 ---
 
 # Stage Handoff
 
-Use a handoff whenever work crosses a stage boundary or moves to a fresh context. The handoff is a contract for the receiving agent, not a transcript of the previous context.
+Use a handoff only when work crosses a meaningful stage or fresh context. It is
+a receiving contract, not a transcript. Store canonical JSON under
+`workflow/handoffs/` with: ID, requirement ID, from/to stage, status, objective,
+acceptance criteria, completed evidence, artifact paths, approved decisions,
+open questions, material risks, one next action, and timestamp.
 
-## Required handoff fields
+Use `ready` only when the receiver can act; use `blocked` for a missing
+decision/evidence and `superseded` for a replacement. Link files and state their
+purpose instead of embedding logs, screenshots, conversation, or reasoning.
+Keep only decisions relevant to the next stage and follow the assigned word
+limit; a material omission is `blocked`.
 
-Store gate-relevant handoffs as JSON under `workflow/handoffs/`, using a stable ID and a descriptive filename. Markdown may supplement a handoff for people, but JSON is the canonical machine-readable contract. Include:
-
-```json
-{
-  "id": "HO-001",
-  "schema_version": "1.0",
-  "requirement_id": "REQ-001",
-  "from_stage": "discovery",
-  "to_stage": "specification",
-  "author_role": "implementation-planner",
-  "status": "ready",
-  "objective": "One-sentence desired outcome",
-  "acceptance_criteria": ["Observable condition"],
-  "completed": ["Evidence-backed work already done"],
-  "artifacts": ["relative/path/to/artifact"],
-  "decisions": ["Decisions already approved"],
-  "open_questions": ["Questions that must be resolved"],
-  "risks": ["Known risks or assumptions"],
-  "next_action": "The first concrete action for the receiving stage",
-  "created_at": "2026-08-11T00:00:00Z"
-}
-```
-
-Use `status: "ready"` only when the next stage has enough information to begin. Use `blocked` when a decision or artifact is missing, and `superseded` when a newer handoff replaces it. Never silently edit a completed handoff to change the requirement; create a new revision or a new handoff.
-
-The receiving specialist may consume the handoff, but only the main agent may validate it and update `workflow/state/current.json`.
-
-## Writing rules
-
-- State facts separately from assumptions.
-- Prefer links to files, diffs, test output, or other evidence over copied logs.
-- Record every artifact with its exact relative path; the coordinator exposes
-  that path as a clickable user-facing link when supported.
-- Keep `next_action` singular and executable.
-- Preserve requirement and artifact IDs across stages.
-- Include only decisions relevant to the receiving stage.
-- Record rejected alternatives only when they prevent likely rework.
-- Keep the summary short enough to load into a clean context.
-
-## Receiving protocol
-
-Before acting on a handoff:
-
-1. Confirm its `status` is `ready`.
-2. Verify the referenced artifacts exist and are still current.
-3. Compare the requirement ID and acceptance criteria with the active task.
-4. Resolve `open_questions` before making behavior-changing decisions.
-5. Perform `next_action`, then create the next handoff with evidence.
-
-If the artifact is stale, incomplete, or inconsistent with the active requirement, stop at the boundary and return a `blocked` handoff describing the discrepancy. Do not reconstruct missing intent from memory.
-
-## Specialist handoffs
-
-Give a specialist the smallest sufficient input: the active requirement, relevant paths, constraints, and requested deliverable. Ask it to return changed paths, checks run, decisions made, open risks, and a next action. Keep exploratory detail in files rather than flooding the coordinator context.
+Before acting, confirm the handoff is current, artifacts exist, IDs and
+acceptance criteria match active work, and open questions are resolved. Stop on
+stale or conflicting evidence. Only the coordinator validates a handoff and
+updates `current.json`.
